@@ -1,0 +1,2119 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UK Pension Contribution Comparison Tool — 2026/27</title>
+<meta name="description" content="Compare Relief at Source, Net Pay, and Salary Sacrifice pension contributions side-by-side. See how much money you're leaving on the table.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0c10;
+  --surface: #12151c;
+  --surface-hover: #181c26;
+  --border: #1e2230;
+  --border-light: #2a2f42;
+  --text-primary: #f0f0f0;
+  --text-secondary: #a0a4b8;
+  --text-tertiary: #6b7084;
+  --ras: #5b7a99;
+  --ras-bg: rgba(91,122,153,0.08);
+  --netpay: #b8966e;
+  --netpay-bg: rgba(184,150,110,0.08);
+  --ss: #00e676;
+  --ss-bg: rgba(0,230,118,0.06);
+  --danger: #ff6b35;
+  --danger-bg: rgba(255,107,53,0.08);
+  --info: #5b9bd5;
+  --info-bg: rgba(91,155,213,0.08);
+  --input-bg: #0e1118;
+  --shadow: 0 2px 12px rgba(0,0,0,0.3);
+  --winner-glow: 0 0 20px rgba(0,230,118,0.15);
+  --delta-positive: #00e676;
+  --delta-negative: #ff6b35;
+  --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+  --font-body: 'DM Sans', -apple-system, sans-serif;
+}
+
+[data-theme="light"] {
+  --bg: #faf8f5;
+  --surface: #ffffff;
+  --surface-hover: #f5f3f0;
+  --border: #e5e2dc;
+  --border-light: #d5d2cc;
+  --text-primary: #1a1a1a;
+  --text-secondary: #555555;
+  --text-tertiary: #888888;
+  --ras: #3d6a8e;
+  --ras-bg: rgba(61,106,142,0.06);
+  --netpay: #8f6d3f;
+  --netpay-bg: rgba(143,109,63,0.06);
+  --ss: #0a8f4a;
+  --ss-bg: rgba(10,143,74,0.06);
+  --danger: #d4532a;
+  --danger-bg: rgba(212,83,42,0.06);
+  --info: #3d7ab8;
+  --info-bg: rgba(61,122,184,0.06);
+  --input-bg: #f0ede8;
+  --shadow: 0 2px 12px rgba(0,0,0,0.06);
+  --winner-glow: 0 0 20px rgba(10,143,74,0.12);
+  --delta-positive: #0a8f4a;
+  --delta-negative: #d4532a;
+}
+
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+.container { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+
+/* ===== HEADER ===== */
+.header { padding: 48px 0 32px; text-align: center; }
+.header__badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 500;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: 20px; padding: 4px 14px 4px 4px; margin-bottom: 20px;
+}
+.header__badge-sep { color: var(--text-tertiary); }
+.tax-year-pills { display: flex; gap: 2px; }
+.tax-year-pill {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+  letter-spacing: 1px; text-transform: uppercase;
+  color: var(--text-tertiary); background: transparent;
+  border: none; border-radius: 16px; padding: 3px 10px;
+  cursor: pointer; transition: all 0.2s;
+}
+.tax-year-pill:hover { color: var(--text-secondary); }
+.tax-year-pill.active {
+  color: var(--text-primary); background: var(--surface-hover);
+}
+.header__title {
+  font-family: var(--font-body);
+  font-size: clamp(28px, 5vw, 38px);
+  font-weight: 700; line-height: 1.2; margin-bottom: 12px;
+}
+.header__subtitle {
+  color: var(--text-secondary); font-size: 15px;
+  max-width: 520px; margin: 0 auto;
+}
+.header__controls { display: flex; justify-content: center; gap: 8px; margin-top: 20px; }
+.theme-toggle {
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text-secondary); font-family: var(--font-mono);
+  font-size: 12px; padding: 6px 14px; border-radius: 8px;
+  cursor: pointer; transition: all 0.2s;
+}
+.theme-toggle:hover { color: var(--text-primary); border-color: var(--border-light); }
+
+/* ===== INPUT SECTION ===== */
+.input-section {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 32px; margin-bottom: 32px;
+}
+.input-group { margin-bottom: 24px; }
+.input-group:last-child { margin-bottom: 0; }
+.input-label {
+  display: block; font-size: 12px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1px;
+  color: var(--text-secondary); margin-bottom: 10px;
+}
+.salary-input-wrap { position: relative; display: flex; align-items: center; }
+.salary-prefix {
+  position: absolute; left: 16px;
+  font-family: var(--font-mono); font-size: 28px; font-weight: 600;
+  color: var(--text-tertiary); pointer-events: none; z-index: 1;
+}
+.salary-input {
+  width: 100%; background: var(--input-bg);
+  border: 1px solid var(--border); border-radius: 12px;
+  padding: 16px 16px 16px 40px;
+  font-family: var(--font-mono); font-size: 28px; font-weight: 600;
+  color: var(--text-primary); outline: none; transition: border-color 0.2s;
+}
+.salary-input:focus { border-color: var(--ss); }
+
+/* Contribution input: slider + text input + toggle */
+.contrib-row { display: flex; align-items: center; gap: 12px; }
+.contrib-slider-wrap { flex: 1; }
+.slider {
+  -webkit-appearance: none; width: 100%; height: 6px;
+  border-radius: 3px; background: var(--border); outline: none;
+}
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 22px; height: 22px;
+  border-radius: 50%; background: var(--ss); cursor: pointer;
+  box-shadow: 0 0 8px rgba(0,230,118,0.3);
+}
+.slider::-moz-range-thumb {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--ss); cursor: pointer; border: none;
+}
+.contrib-input {
+  width: 100px; background: var(--input-bg);
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 10px; font-family: var(--font-mono);
+  font-size: 16px; font-weight: 600; color: var(--text-primary);
+  text-align: right; outline: none;
+}
+.contrib-input:focus { border-color: var(--ss); }
+.contrib-mode-toggle {
+  display: flex; background: var(--input-bg);
+  border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+}
+.contrib-mode-btn {
+  padding: 8px 14px; font-family: var(--font-mono);
+  font-size: 12px; font-weight: 600; border: none;
+  background: transparent; color: var(--text-tertiary);
+  cursor: pointer; transition: all 0.2s;
+}
+.contrib-mode-btn.active {
+  background: var(--border); color: var(--text-primary);
+}
+
+.compare-mode { display: flex; align-items: center; gap: 10px; }
+.compare-mode__label {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.8px; color: var(--text-secondary); white-space: nowrap;
+}
+.compare-mode__pills {
+  display: flex; background: var(--input-bg);
+  border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+}
+.compare-mode__pill {
+  padding: 7px 14px; font-family: var(--font-body);
+  font-size: 12px; font-weight: 600; border: none;
+  background: transparent; color: var(--text-tertiary);
+  cursor: pointer; transition: all 0.2s; white-space: nowrap;
+}
+.compare-mode__pill.active {
+  background: var(--border); color: var(--text-primary);
+}
+.compare-mode__pill:hover:not(.active) { color: var(--text-secondary); }
+.compare-mode__hint {
+  font-size: 11px; color: var(--text-tertiary); font-style: italic;
+}
+
+.period-select {
+  background: var(--input-bg); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 14px;
+  font-family: var(--font-body); font-size: 14px;
+  color: var(--text-primary); outline: none; cursor: pointer; width: 100%;
+}
+.period-select:focus { border-color: var(--ss); }
+
+/* ===== ADVANCED OPTIONS ===== */
+.advanced-toggle {
+  display: flex; align-items: center; gap: 8px;
+  background: none; border: none; color: var(--text-secondary);
+  font-family: var(--font-body); font-size: 14px; font-weight: 500;
+  cursor: pointer; padding: 8px 0; margin-bottom: 8px; transition: color 0.2s;
+}
+.advanced-toggle:hover { color: var(--text-primary); }
+.advanced-toggle__arrow {
+  display: inline-block;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  font-size: 12px;
+}
+.advanced-toggle__arrow.open { transform: rotate(90deg); }
+.advanced-panel {
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
+  opacity: 0;
+}
+.advanced-panel.open { max-height: 800px; opacity: 1; }
+.advanced-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 16px; padding-top: 16px; border-top: 1px solid var(--border);
+}
+.adv-field label {
+  display: block; font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.8px;
+  color: var(--text-secondary); margin-bottom: 6px;
+}
+.adv-field input, .adv-field select {
+  width: 100%; background: var(--input-bg);
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 12px; font-family: var(--font-body);
+  font-size: 13px; color: var(--text-primary); outline: none;
+}
+.adv-field input:focus, .adv-field select:focus { border-color: var(--ss); }
+.toggle-row {
+  display: flex; align-items: center;
+  justify-content: space-between; padding: 8px 0;
+}
+.toggle-row__label { font-size: 13px; color: var(--text-secondary); }
+.toggle-switch { position: relative; width: 40px; height: 22px; cursor: pointer; }
+.toggle-switch input { display: none; }
+.toggle-switch__track {
+  position: absolute; inset: 0;
+  background: var(--border); border-radius: 11px; transition: background 0.2s;
+}
+.toggle-switch input:checked + .toggle-switch__track { background: var(--ss); }
+.toggle-switch__thumb {
+  position: absolute; top: 2px; left: 2px;
+  width: 18px; height: 18px; background: #fff;
+  border-radius: 50%; transition: transform 0.2s; pointer-events: none;
+}
+.toggle-switch input:checked ~ .toggle-switch__thumb { transform: translateX(18px); }
+.match-fields { display: none; gap: 8px; margin-top: 8px; }
+.match-fields.visible { display: grid; grid-template-columns: 1fr 1fr; }
+.match-fields .adv-field { margin: 0; }
+.qe-fields { display: none; gap: 8px; margin-top: 8px; }
+.qe-fields.visible { display: grid; grid-template-columns: 1fr 1fr; }
+.loan-checks { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.loan-check {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 12px; color: var(--text-secondary); cursor: pointer;
+}
+.loan-check input { accent-color: var(--ss); }
+
+/* ===== COMPARISON CARDS ===== */
+.cards {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 12px; margin-bottom: 40px;
+}
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px 12px;
+  position: relative; overflow: hidden;
+  transition: box-shadow 0.3s, border-color 0.3s;
+}
+.card::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+}
+.card--ras::before { background: var(--ras); }
+.card--netpay::before { background: var(--netpay); }
+.card--ss::before { background: var(--ss); }
+.card__method { font-family: var(--font-body); font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.card--ras .card__method { color: var(--ras); }
+.card--netpay .card__method { color: var(--netpay); }
+.card--ss .card__method { color: var(--ss); }
+.card__rate-badge {
+  display: none; font-family: var(--font-mono); font-size: 11px;
+  font-weight: 600; color: var(--text-secondary); margin-bottom: 4px;
+}
+.card__rate-badge.visible { display: block; }
+.card__rate-badge .matched-rate { color: var(--text-primary); }
+.card__desc {
+  font-size: 10px; color: var(--text-tertiary);
+  margin-bottom: 12px; line-height: 1.4;
+  min-height: 28px;
+}
+.card__rows { display: flex; flex-direction: column; gap: 0; }
+.card__row {
+  display: flex; justify-content: space-between;
+  align-items: baseline; font-size: 11px;
+  padding: 4px 0; min-height: 24px;
+  gap: 6px;
+}
+.card__row > div { text-align: right; flex-shrink: 0; }
+.card__row-label { color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1; }
+.card__row-value {
+  font-family: var(--font-mono); font-size: 12px;
+  font-weight: 500; text-align: right;
+  white-space: nowrap;
+}
+.card__delta {
+  display: block; font-size: 9px; font-weight: 600;
+  font-family: var(--font-mono); text-align: right;
+  margin-top: 1px; white-space: nowrap;
+}
+.card__delta--positive { color: var(--delta-positive); }
+.card__delta--negative { color: var(--delta-negative); }
+.card__divider { border: none; border-top: 1px solid var(--border); margin: 3px 0; }
+.card__highlight { font-size: 12px; font-weight: 600; }
+.card__highlight .card__row-value { font-size: 13px; font-weight: 700; }
+.card__subnote {
+  display: block; font-size: 10px; color: var(--text-tertiary);
+  font-family: var(--font-mono); margin-top: 1px; text-align: right;
+}
+.card__row--muted .card__row-value { color: var(--text-secondary); }
+
+/* ===== INFO BOX ===== */
+
+/* ===== INCOME RULER ===== */
+.ruler-section { margin-bottom: 40px; }
+.section-title { font-family: var(--font-body); font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+.section-subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; }
+.ruler-container {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 24px;
+}
+.ruler-row { display: flex; flex-direction: column; gap: 4px; margin-bottom: 14px; }
+.ruler-row:last-of-type { margin-bottom: 0; }
+.ruler-row-header { display: flex; justify-content: space-between; align-items: baseline; }
+.ruler-row-label {
+  font-size: 11px; font-weight: 600; color: var(--text-secondary);
+  font-family: var(--font-mono); white-space: nowrap;
+}
+.ruler-row-total {
+  font-size: 11px; font-family: var(--font-mono); font-weight: 500;
+  color: var(--text-tertiary); white-space: nowrap;
+}
+.ruler-row-bar-wrap { display: flex; align-items: center; }
+.ruler-bar {
+  height: 32px; border-radius: 5px;
+  overflow: hidden; display: flex; position: relative;
+  transition: width 0.4s ease;
+}
+.ruler-segment {
+  height: 100%; position: relative;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-weight: 600;
+  color: rgba(255,255,255,0.95); min-width: 2px;
+  overflow: hidden; white-space: nowrap;
+  transition: width 0.4s ease; padding: 0 4px;
+}
+.ruler-segment__rate { font-size: 10px; line-height: 1; }
+.ruler-segment__amount { font-size: 8px; line-height: 1; opacity: 0.8; margin-top: 1px; }
+.ruler-legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+.ruler-legend-item {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--text-secondary);
+}
+.ruler-legend-swatch { width: 12px; height: 12px; border-radius: 3px; }
+.ruler-note {
+  font-size: 11px; color: var(--text-tertiary); margin-top: 14px;
+  font-style: italic; line-height: 1.5;
+}
+@keyframes trapPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+.ruler-segment.trap-zone { animation: trapPulse 2s ease-in-out infinite; }
+
+/* ===== COMPOUND GROWTH ===== */
+.projection-section { margin-bottom: 40px; }
+.projection-container {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 24px;
+}
+.projection-inputs { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+.projection-inputs .adv-field { flex: 1; min-width: 120px; }
+.projection-hero {
+  text-align: center; padding: 20px 0;
+  margin-bottom: 16px; border-bottom: 1px solid var(--border);
+}
+.projection-hero__diff {
+  font-family: var(--font-mono); font-size: clamp(24px, 5vw, 36px);
+  font-weight: 700; color: var(--ss); margin-bottom: 4px;
+}
+.projection-hero__context { font-size: 13px; color: var(--text-secondary); }
+.projection-pots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.projection-pot { text-align: center; padding: 16px 8px; border-radius: 8px; }
+.projection-pot--ras { background: var(--ras-bg); }
+.projection-pot--netpay { background: var(--netpay-bg); }
+.projection-pot--ss { background: var(--ss-bg); }
+.projection-pot__label {
+  font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;
+}
+.projection-pot--ras .projection-pot__label { color: var(--ras); }
+.projection-pot--netpay .projection-pot__label { color: var(--netpay); }
+.projection-pot--ss .projection-pot__label { color: var(--ss); }
+.projection-pot__value { font-family: var(--font-mono); font-size: 18px; font-weight: 700; }
+.projection-caveat {
+  font-size: 11px; color: var(--text-tertiary);
+  margin-top: 16px; font-style: italic;
+}
+
+/* ===== INSIGHT CARDS ===== */
+.insights-section { margin-bottom: 40px; }
+.insights-grid { display: flex; flex-direction: column; gap: 10px; }
+.insight-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px 20px;
+  display: flex; gap: 14px; align-items: flex-start;
+}
+.insight-card--warning { border-left: 3px solid var(--danger); background: var(--danger-bg); }
+.insight-card--info { border-left: 3px solid var(--info); background: var(--info-bg); }
+.insight-card--success { border-left: 3px solid var(--ss); background: var(--ss-bg); }
+.insight-card__icon { font-size: 20px; flex-shrink: 0; line-height: 1; }
+.insight-card__body { flex: 1; }
+.insight-card__title { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+.insight-card__text { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+
+/* ===== EXPLAINER CARDS ===== */
+.explainers-section { margin-bottom: 40px; }
+.explainer-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+.explainer-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px 18px;
+  border-left: 3px solid var(--info);
+  font-size: 13px; color: var(--text-secondary); line-height: 1.6;
+}
+.explainer-card--warning { border-left-color: var(--danger); }
+.explainer-card__title {
+  font-size: 13px; font-weight: 700; color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+/* ===== SHARE & FOOTER ===== */
+.share-section { text-align: center; margin-bottom: 40px; }
+.share-btn {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 24px;
+  font-family: var(--font-mono); font-size: 13px;
+  color: var(--text-secondary); cursor: pointer; transition: all 0.2s;
+}
+.share-btn:hover { border-color: var(--ss); color: var(--ss); }
+.footer {
+  text-align: center; padding: 32px 0 48px;
+  font-size: 12px; color: var(--text-tertiary);
+  line-height: 1.8; border-top: 1px solid var(--border);
+}
+
+/* ===== TOOLTIPS ===== */
+.tooltip-trigger {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--border); color: var(--text-tertiary);
+  font-size: 10px; font-weight: 700; cursor: help;
+  margin-left: 6px; vertical-align: middle; position: relative;
+  font-family: var(--font-mono); line-height: 1;
+}
+.tooltip-trigger:hover { background: var(--border-light); color: var(--text-secondary); }
+.tooltip-trigger .tooltip-text {
+  visibility: hidden; opacity: 0;
+  position: absolute; bottom: calc(100% + 8px); left: 50%;
+  transform: translateX(-50%);
+  background: var(--text-primary); color: var(--bg);
+  font-family: var(--font-body); font-size: 11px; font-weight: 400;
+  line-height: 1.5; padding: 8px 12px; border-radius: 8px;
+  width: 240px; z-index: 10; pointer-events: none;
+  transition: opacity 0.15s, visibility 0.15s;
+  text-transform: none; letter-spacing: 0;
+}
+.tooltip-trigger .tooltip-text::after {
+  content: ''; position: absolute; top: 100%; left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent; border-top-color: var(--text-primary);
+}
+.tooltip-trigger:hover .tooltip-text { visibility: visible; opacity: 1; }
+@media (max-width: 640px) {
+  .tooltip-trigger .tooltip-text { width: 200px; left: auto; right: -8px; transform: none; }
+  .tooltip-trigger .tooltip-text::after { left: auto; right: 12px; transform: none; }
+}
+
+/* ===== MATRIX ===== */
+.matrix-section { padding: 40px 0; }
+.matrix-section .section-title { text-align: center; }
+.matrix-section .section-subtitle { text-align: center; color: var(--text-secondary); font-size: 14px; margin-bottom: 20px; }
+.matrix-wrap { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+.matrix-controls {
+  display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 16px;
+}
+.matrix-method-pills {
+  display: flex; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 3px; gap: 2px;
+}
+.matrix-method-pill {
+  font-family: var(--font-body); font-size: 12px; font-weight: 600;
+  padding: 7px 16px; border: none; border-radius: 8px;
+  cursor: pointer; transition: all 0.2s; background: transparent; color: var(--text-tertiary);
+}
+.matrix-method-pill.active { color: var(--text-primary); background: var(--surface-hover); box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+.matrix-scroll {
+  overflow-x: auto; border-radius: 12px;
+  border: 1px solid var(--border); background: var(--surface);
+}
+.matrix-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+.matrix-scroll::-webkit-scrollbar-track { background: transparent; }
+.matrix-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.matrix-table { border-collapse: separate; border-spacing: 0; width: max-content; min-width: 100%; }
+.matrix-table thead th {
+  position: sticky; top: 0; background: var(--surface); z-index: 10;
+  padding: 10px 8px; text-align: center; border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono); font-size: 11px; font-weight: 500; color: var(--text-tertiary);
+  letter-spacing: 0.04em;
+}
+.matrix-table thead th:first-child { position: sticky; left: 0; z-index: 20; text-align: left; min-width: 100px; }
+.matrix-table thead th .matrix-col-pct { font-size: 13px; font-weight: 600; color: var(--text-secondary); display: block; }
+.matrix-table thead th .matrix-col-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.08em; }
+.matrix-table thead th.matrix-col--active .matrix-col-pct { color: var(--text-primary); }
+.matrix-table tbody td { padding: 0; border-bottom: 1px solid rgba(30,34,48,0.5); border-right: 1px solid rgba(30,34,48,0.3); vertical-align: top; min-width: 110px; }
+.matrix-table tbody td:first-child {
+  position: sticky; left: 0; background: var(--surface); z-index: 5;
+  border-right: 1px solid var(--border); padding: 8px 12px; min-width: 100px;
+  font-family: var(--font-mono); font-size: 11px;
+}
+.matrix-table tbody td:last-child { border-right: none; }
+.matrix-table tbody tr:last-child td { border-bottom: none; }
+.matrix-sal-label { font-size: 9px; color: var(--text-tertiary); letter-spacing: 0.05em; }
+.matrix-sal-val { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+.matrix-cell { padding: 6px 10px; }
+.matrix-cell__thp { font-family: var(--font-mono); font-size: 12px; font-weight: 500; color: var(--text-primary); }
+.matrix-cell__pension { font-family: var(--font-mono); font-size: 10px; color: var(--text-secondary); margin-top: 2px; }
+.matrix-cell__pension span { text-transform: uppercase; font-size: 9px; letter-spacing: 0.05em; }
+/* Crosshair: user's salary row */
+.matrix-row--active > td:first-child { background: var(--surface-hover) !important; }
+.matrix-row--active > td { background: rgba(255,255,255,0.02); }
+/* Crosshair: user's contribution column */
+.matrix-col--active { background: rgba(255,255,255,0.02); }
+/* Crosshair: the intersection cell */
+.matrix-cell--crosshair {
+  background: rgba(91,155,213,0.10) !important;
+  box-shadow: inset 0 0 0 2px var(--info);
+  border-radius: 3px;
+}
+.matrix-cell--crosshair .matrix-cell__thp { font-weight: 700; }
+/* PA taper zone: amber shading — on <td>, must override column highlight */
+td.matrix-trap-cell { background: rgba(255,107,53,0.06) !important; }
+td.matrix-trap-cell .matrix-cell__thp { color: var(--danger); }
+/* Pinned salary row */
+.matrix-sal-pinned { font-size: 8px; color: var(--info); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+/* Footer: employer note + legend */
+.matrix-footer { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-top: 10px; padding: 0 4px; }
+.matrix-employer-note { font-size: 11px; color: var(--text-tertiary); font-family: var(--font-mono); }
+.matrix-legend { display: flex; gap: 16px; flex-wrap: wrap; }
+.matrix-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-tertiary); }
+.matrix-legend-swatch { width: 14px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+.matrix-legend-swatch--trap { background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.3); }
+.matrix-legend-swatch--you { background: rgba(91,155,213,0.15); border: 2px solid var(--info); }
+/* Mobile sweep */
+.matrix-mobile { display: none; }
+.matrix-mobile-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 12px 16px; margin-bottom: 8px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.matrix-mobile-card--active { border-color: var(--info); background: var(--info-bg); }
+.matrix-mobile-salary { font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
+.matrix-mobile-values { text-align: right; }
+.matrix-mobile-thp { font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--text-primary); }
+.matrix-mobile-pension { font-family: var(--font-mono); font-size: 10px; color: var(--text-tertiary); }
+
+/* ===== MOBILE ===== */
+.mobile-tabs { display: none; margin-bottom: 12px; }
+.mobile-tabs__bar {
+  display: flex; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+}
+.mobile-tabs__tab {
+  flex: 1; padding: 10px 8px; text-align: center;
+  font-size: 12px; font-weight: 600;
+  background: none; border: none; color: var(--text-secondary);
+  cursor: pointer; transition: all 0.2s;
+  border-bottom: 2px solid transparent;
+}
+.mobile-tabs__tab.active { color: var(--text-primary); }
+.mobile-tabs__tab--ras.active { border-bottom-color: var(--ras); color: var(--ras); }
+.mobile-tabs__tab--netpay.active { border-bottom-color: var(--netpay); color: var(--netpay); }
+.mobile-tabs__tab--ss.active { border-bottom-color: var(--ss); color: var(--ss); }
+.mobile-tabs__tab--all.active { border-bottom-color: var(--text-primary); }
+
+@media (max-width: 640px) {
+  .container { padding: 0 16px; }
+  .header { padding: 32px 0 24px; }
+  .input-section { padding: 20px; }
+  .container { max-width: 100%; }
+  .salary-input { font-size: 22px; padding: 14px 14px 14px 36px; }
+  .salary-prefix { font-size: 22px; }
+  .contrib-row { flex-wrap: wrap; }
+  .contrib-slider-wrap { min-width: 100%; }
+  .advanced-grid { grid-template-columns: 1fr; }
+  .cards { grid-template-columns: 1fr; }
+  .mobile-tabs { display: block; }
+  .card { display: none; }
+  .card.mobile-visible { display: block; }
+  .cards.show-all .card { display: block; }
+  .projection-pots { grid-template-columns: 1fr; }
+  .ruler-row { flex-direction: column; align-items: stretch; gap: 4px; }
+  .ruler-row-label { text-align: left; min-width: unset; }
+  .ruler-bar { height: 24px; }
+  .ruler-segment__amount { display: none; }
+  .matrix-scroll { display: none; }
+  .matrix-mobile { display: block; }
+  .matrix-wrap { padding: 0; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.card { animation: fadeInUp 0.3s ease both; }
+.card:nth-child(2) { animation-delay: 0.05s; }
+.card:nth-child(3) { animation-delay: 0.1s; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="header">
+    <div class="header__badge">
+      <div class="tax-year-pills">
+        <button class="tax-year-pill active" data-year="2026/27" onclick="setTaxYear('2026/27')">2026/27</button>
+        <button class="tax-year-pill" data-year="2025/26" onclick="setTaxYear('2025/26')">2025/26</button>
+      </div>
+      <span class="header__badge-sep">&middot;</span> UK
+    </div>
+    <h1 class="header__title">Pension Contribution Comparison Tool</h1>
+    <p class="header__subtitle">Compare Relief at Source, Net Pay, and Salary Sacrifice side-by-side. See how much money you're leaving on the table.</p>
+    <div class="header__controls">
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark/light mode">
+        <span id="themeIcon">☀</span> <span id="themeLabel">Light</span>
+      </button>
+    </div>
+  </header>
+
+  <section class="input-section">
+    <div class="input-group">
+      <label class="input-label" for="salary">Gross Annual Salary</label>
+      <div class="salary-input-wrap">
+        <span class="salary-prefix">£</span>
+        <input type="text" id="salary" class="salary-input" value="120,000" inputmode="numeric" autocomplete="off">
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label class="input-label">Employee Contribution</label>
+      <div class="contrib-row">
+        <div class="contrib-slider-wrap">
+          <input type="range" id="contribSlider" class="slider" min="0" max="40" step="0.01" value="17">
+        </div>
+        <input type="text" id="contribInput" class="contrib-input" value="17%" autocomplete="off">
+        <div class="contrib-mode-toggle">
+          <button class="contrib-mode-btn active" data-mode="percent" onclick="setContribMode('percent')">%</button>
+          <button class="contrib-mode-btn" data-mode="fixed" onclick="setContribMode('fixed')">£</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <div class="compare-mode">
+        <span class="compare-mode__label">Compare at</span>
+        <div class="compare-mode__pills">
+          <button class="compare-mode__pill active" data-mode="same-rate" onclick="setCompareMode('same-rate')">Same rate</button>
+          <button class="compare-mode__pill" data-mode="same-takehome" onclick="setCompareMode('same-takehome')">Same take-home</button>
+        </div>
+        <span class="compare-mode__hint" id="compareModeHint"></span>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label class="input-label" for="period">Display Period</label>
+      <select id="period" class="period-select">
+        <option value="365">Daily</option>
+        <option value="52">Weekly</option>
+        <option value="26">Fortnightly</option>
+        <option value="13">4-Weekly</option>
+        <option value="12" selected>Monthly</option>
+        <option value="1">Annual</option>
+      </select>
+    </div>
+
+    <button class="advanced-toggle" onclick="toggleAdvanced()">
+      <span class="advanced-toggle__arrow" id="advArrow">▶</span> Customise
+    </button>
+    <div class="advanced-panel" id="advPanel">
+      <div class="advanced-grid">
+        <div class="adv-field">
+          <label for="employerMode">Employer Contribution<span class="tooltip-trigger">?<span class="tooltip-text">How your employer calculates their contribution. "Flat rate" = fixed %. "Match" = they match your % up to a cap. "Base + Match" = a guaranteed base % plus matching.</span></span></label>
+          <select id="employerMode" onchange="updateEmployerFields(); recalculate();">
+            <option value="flat">Flat rate</option>
+            <option value="match">Match up to</option>
+            <option value="basematch">Base + Match</option>
+          </select>
+        </div>
+        <div class="adv-field">
+          <label for="employerRate">Employer Rate %</label>
+          <input type="number" id="employerRate" value="3" min="0" max="100" step="0.5" onchange="recalculate()">
+        </div>
+        <div class="adv-field match-fields" id="matchFields">
+          <div>
+            <label for="matchCap">Match Cap %</label>
+            <input type="number" id="matchCap" value="5" min="0" max="100" step="0.5" onchange="recalculate()">
+          </div>
+          <div id="baseRateField" style="display:none">
+            <label for="baseRate">Base Rate %</label>
+            <input type="number" id="baseRate" value="3" min="0" max="100" step="0.5" onchange="recalculate()">
+          </div>
+        </div>
+
+        <div class="adv-field" style="grid-column: 1 / -1;">
+          <div class="toggle-row">
+            <span class="toggle-row__label">Qualifying Earnings Band<span class="tooltip-trigger">?<span class="tooltip-text">When enabled, employer contributions are calculated on qualifying earnings only (lower and upper limits vary by tax year) — not your full salary. Common for auto-enrolment schemes. Most tech employers use full salary, so leave this off unless you know otherwise.</span></span></span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="qualifyingEarnings" onchange="toggleQEFields(); recalculate()">
+              <span class="toggle-switch__track"></span>
+              <span class="toggle-switch__thumb"></span>
+            </label>
+          </div>
+          <div class="qe-fields" id="qeFields">
+            <div class="adv-field">
+              <label for="qeLower">Lower Limit £</label>
+              <input type="number" id="qeLower" value="6708" min="0" max="100000" step="1" onchange="recalculate()">
+            </div>
+            <div class="adv-field">
+              <label for="qeUpper">Upper Limit £</label>
+              <input type="number" id="qeUpper" value="50270" min="0" max="200000" step="1" onchange="recalculate()">
+            </div>
+          </div>
+        </div>
+
+        <div class="adv-field" style="grid-column: 1 / -1;">
+          <div class="toggle-row">
+            <span class="toggle-row__label">Employer NI Pass-through<span class="tooltip-trigger">?<span class="tooltip-text">When you sacrifice salary, your employer also saves on their NI. Some employers pass part or all of that saving into your pension. Check your scheme details — this is free money if offered.</span></span></span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="niPassthrough" onchange="toggleNIPassField(); recalculate()">
+              <span class="toggle-switch__track"></span>
+              <span class="toggle-switch__thumb"></span>
+            </label>
+          </div>
+        </div>
+        <div class="adv-field" id="niPassthroughField" style="display:none">
+          <label for="niPassRate">Pass-through %</label>
+          <input type="number" id="niPassRate" value="100" min="0" max="100" step="1" onchange="recalculate()">
+        </div>
+
+        <div class="adv-field" style="grid-column: 1 / -1;">
+          <div class="toggle-row">
+            <span class="toggle-row__label">Scottish Taxpayer<span class="tooltip-trigger">?<span class="tooltip-text">Scotland has different income tax bands and rates (19%–48%). If you live in Scotland, enable this for accurate calculations. NI rates are the same across the UK.</span></span></span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="scottish" onchange="recalculate()">
+              <span class="toggle-switch__track"></span>
+              <span class="toggle-switch__thumb"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="adv-field" style="grid-column: 1 / -1;">
+          <label>Student Loan Repayment<span class="tooltip-trigger">?<span class="tooltip-text">Select all plans that apply. Repayments are 9% above the threshold (6% for postgrad). Salary Sacrifice reduces your repayable income, lowering these payments.</span></span></label>
+          <div class="loan-checks">
+            <label class="loan-check"><input type="checkbox" value="plan1" onchange="recalculate()"> Plan 1</label>
+            <label class="loan-check"><input type="checkbox" value="plan2" onchange="recalculate()"> Plan 2</label>
+            <label class="loan-check"><input type="checkbox" value="plan4" onchange="recalculate()"> Plan 4</label>
+            <label class="loan-check"><input type="checkbox" value="plan5" onchange="recalculate()"> Plan 5</label>
+            <label class="loan-check"><input type="checkbox" value="postgrad" onchange="recalculate()"> Postgrad</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MOBILE TABS -->
+  <div class="mobile-tabs" id="mobileTabs">
+    <div class="mobile-tabs__bar">
+      <button class="mobile-tabs__tab mobile-tabs__tab--ras active" data-method="ras" onclick="switchTab('ras')">RAS</button>
+      <button class="mobile-tabs__tab mobile-tabs__tab--netpay" data-method="netpay" onclick="switchTab('netpay')">Net Pay</button>
+      <button class="mobile-tabs__tab mobile-tabs__tab--ss" data-method="ss" onclick="switchTab('ss')">SS</button>
+      <button class="mobile-tabs__tab mobile-tabs__tab--all" data-method="all" onclick="switchTab('all')">All</button>
+    </div>
+  </div>
+
+  <!-- COMPARISON CARDS -->
+  <div class="cards" id="cards">
+    <div class="card card--ras mobile-visible" id="cardRas">
+
+      <div class="card__method">Relief at Source</div>
+      <div class="card__rate-badge" id="rateBadgeRas"></div>
+      <div class="card__desc">You pay from net pay. HMRC adds 20% tax relief to your pension pot.</div>
+      <div class="card__rows" id="rowsRas"></div>
+    </div>
+    <div class="card card--netpay" id="cardNetpay">
+
+      <div class="card__method">Net Pay Arrangement</div>
+      <div class="card__rate-badge" id="rateBadgeNetpay"></div>
+      <div class="card__desc">Pension deducted before tax. Full relief at your marginal rate.</div>
+      <div class="card__rows" id="rowsNetpay"></div>
+    </div>
+    <div class="card card--ss" id="cardSs">
+
+      <div class="card__method">Salary Sacrifice</div>
+      <div class="card__rate-badge" id="rateBadgeSs"></div>
+      <div class="card__desc">You give up salary. Save NI on top of income tax.</div>
+      <div class="card__rows" id="rowsSs"></div>
+    </div>
+  </div>
+
+
+  <!-- COMPOUND GROWTH (above ruler for narrative flow) -->
+  <section class="projection-section">
+    <h2 class="section-title">What This Means at Retirement</h2>
+    <p class="section-subtitle">The pension pot difference, compounded over time</p>
+    <div class="projection-container">
+      <div class="projection-inputs">
+        <div class="adv-field">
+          <label for="projCurrentPot">Current Pension Pot</label>
+          <input type="text" id="projCurrentPot" value="0" inputmode="numeric" onchange="recalculate()" onclick="this.select()">
+        </div>
+        <div class="adv-field">
+          <label for="projYears">Years to Retirement</label>
+          <input type="number" id="projYears" value="25" min="1" max="50" onchange="recalculate()">
+        </div>
+        <div class="adv-field">
+          <label for="projGrowth">Growth Rate (% real)</label>
+          <input type="number" id="projGrowth" value="5" min="0" max="15" step="0.5" onchange="recalculate()">
+        </div>
+      </div>
+      <div class="projection-hero">
+        <div class="projection-hero__diff" id="projDiff">£0</div>
+        <div class="projection-hero__context" id="projContext">more in your pension with Salary Sacrifice</div>
+      </div>
+      <div class="projection-pots">
+        <div class="projection-pot projection-pot--ras">
+          <div class="projection-pot__label">Relief at Source</div>
+          <div class="projection-pot__value" id="projRas">£0</div>
+        </div>
+        <div class="projection-pot projection-pot--netpay">
+          <div class="projection-pot__label">Net Pay</div>
+          <div class="projection-pot__value" id="projNetpay">£0</div>
+        </div>
+        <div class="projection-pot projection-pot--ss">
+          <div class="projection-pot__label">Salary Sacrifice</div>
+          <div class="projection-pot__value" id="projSs">£0</div>
+        </div>
+      </div>
+      <div class="projection-caveat">Assumes real growth after inflation. Past performance does not guarantee future results. This is an illustration, not financial advice.</div>
+    </div>
+  </section>
+
+  <!-- SALARY × CONTRIBUTION MATRIX -->
+  <section class="matrix-section">
+    <div class="matrix-wrap">
+      <h2 class="section-title">Explore Across Salary &amp; Contribution Rates</h2>
+      <p class="section-subtitle">See how take-home pay and pension change across different scenarios</p>
+      <div class="matrix-controls">
+        <div class="matrix-method-pills">
+          <button class="matrix-method-pill active" data-method="ras" onclick="setMatrixMethod('ras')">Relief at Source</button>
+          <button class="matrix-method-pill" data-method="ss" onclick="setMatrixMethod('ss')">Salary Sacrifice</button>
+        </div>
+      </div>
+      <div class="matrix-scroll" id="matrixDesktop"></div>
+      <div class="matrix-mobile" id="matrixMobile"></div>
+      <div class="matrix-footer">
+        <div class="matrix-employer-note" id="matrixEmployerNote"></div>
+        <div class="matrix-legend">
+          <div class="matrix-legend-item"><span class="matrix-legend-swatch matrix-legend-swatch--you"></span>Your current position</div>
+          <div class="matrix-legend-item"><span class="matrix-legend-swatch matrix-legend-swatch--trap"></span>Personal allowance taper — 60% effective rate (£100k–£125,140)</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INCOME RULER -->
+  <section class="ruler-section">
+    <h2 class="section-title">Your Marginal Tax Rate</h2>
+    <p class="section-subtitle">How each pound of your income is taxed under each method</p>
+    <div class="ruler-container">
+      <div id="rulerBars"></div>
+      <div class="ruler-legend" id="rulerLegend"></div>
+      <div class="ruler-note">NI is not shown here. Salary Sacrifice also reduces National Insurance — see the comparison cards above for the full picture.</div>
+    </div>
+  </section>
+
+  <!-- INSIGHTS -->
+  <section class="insights-section" id="insightsSection" style="display:none">
+    <h2 class="section-title">Things to Know</h2>
+    <p class="section-subtitle">Personalised insights based on your salary and contribution</p>
+    <div class="insights-grid" id="insightsGrid"></div>
+  </section>
+
+  <!-- EXPLAINER CARDS -->
+  <section class="explainers-section" id="explainersSection">
+    <h2 class="section-title">What's Happening Here</h2>
+    <p class="section-subtitle">The key differences between these three methods</p>
+    <div class="explainer-grid" id="explainerGrid"></div>
+  </section>
+
+  <section class="share-section">
+    <button class="share-btn" onclick="copyShareLink()">Copy shareable link</button>
+  </section>
+
+  <footer class="footer">
+    <p>This calculator is for illustrative purposes only and does not constitute financial advice.</p>
+    <p>Tax rules can change. Always check with HMRC or a qualified adviser for your specific circumstances.</p>
+    <p style="margin-top:8px">Built by Ruan Shah · 2025/26 tax year</p>
+  </footer>
+
+</div>
+
+<script>
+// ===================================================================
+// CALCULATION ENGINE
+// ===================================================================
+
+const TAX_YEARS = {
+  '2026/27': {
+    label: '2026/27',
+    personalAllowance: 12570,
+    paTaperStart: 100000,
+    bands: {
+      england: [
+        { name: "Basic", from: 0, to: 37700, rate: 0.20, color: "#3b82f6" },
+        { name: "Higher", from: 37700, to: 99870, rate: 0.40, color: "#f59e0b" },
+        { name: "Additional", from: 99870, to: Infinity, rate: 0.45, color: "#ef4444" }
+      ],
+      scotland: [
+        { name: "Starter", from: 0, to: 3967, rate: 0.19, color: "#60a5fa" },
+        { name: "Basic", from: 3967, to: 16956, rate: 0.20, color: "#3b82f6" },
+        { name: "Intermediate", from: 16956, to: 31092, rate: 0.21, color: "#a78bfa" },
+        { name: "Higher", from: 31092, to: 62430, rate: 0.42, color: "#f59e0b" },
+        { name: "Advanced", from: 62430, to: 112570, rate: 0.45, color: "#f97316" },
+        { name: "Top", from: 112570, to: Infinity, rate: 0.48, color: "#ef4444" }
+      ]
+    },
+    ni: { employeeMain: 0.08, employeeUpper: 0.02, pt: 12570, upt: 50270 },
+    employerNI: { rate: 0.15, threshold: 5000 },
+    studentLoans: {
+      plan1: { threshold: 26900, rate: 0.09 },
+      plan2: { threshold: 29385, rate: 0.09 },
+      plan4: { threshold: 33795, rate: 0.09 },
+      plan5: { threshold: 25000, rate: 0.09 },
+      postgrad: { threshold: 21000, rate: 0.06 }
+    },
+    annualAllowance: { standard: 60000, taperStart: 260000, minimum: 10000 },
+    qualifyingEarnings: { lower: 6708, upper: 50270 },
+    lumpSumAllowance: 268275,
+    nmw: 26429
+  },
+  '2025/26': {
+    label: '2025/26',
+    personalAllowance: 12570,
+    paTaperStart: 100000,
+    bands: {
+      england: [
+        { name: "Basic", from: 0, to: 37700, rate: 0.20, color: "#3b82f6" },
+        { name: "Higher", from: 37700, to: 99870, rate: 0.40, color: "#f59e0b" },
+        { name: "Additional", from: 99870, to: Infinity, rate: 0.45, color: "#ef4444" }
+      ],
+      scotland: [
+        { name: "Starter", from: 0, to: 2827, rate: 0.19, color: "#60a5fa" },
+        { name: "Basic", from: 2827, to: 14921, rate: 0.20, color: "#3b82f6" },
+        { name: "Intermediate", from: 14921, to: 31092, rate: 0.21, color: "#a78bfa" },
+        { name: "Higher", from: 31092, to: 62430, rate: 0.42, color: "#f59e0b" },
+        { name: "Advanced", from: 62430, to: 112570, rate: 0.45, color: "#f97316" },
+        { name: "Top", from: 112570, to: Infinity, rate: 0.48, color: "#ef4444" }
+      ]
+    },
+    ni: { employeeMain: 0.08, employeeUpper: 0.02, pt: 12570, upt: 50270 },
+    employerNI: { rate: 0.15, threshold: 5000 },
+    studentLoans: {
+      plan1: { threshold: 26065, rate: 0.09 },
+      plan2: { threshold: 28470, rate: 0.09 },
+      plan4: { threshold: 32745, rate: 0.09 },
+      plan5: { threshold: 25000, rate: 0.09 },
+      postgrad: { threshold: 21000, rate: 0.06 }
+    },
+    annualAllowance: { standard: 60000, taperStart: 260000, minimum: 10000 },
+    qualifyingEarnings: { lower: 6500, upper: 50270 },
+    lumpSumAllowance: 268275,
+    nmw: 25397
+  }
+};
+
+let currentTaxYear = '2026/27';
+let TAX_CONFIG = TAX_YEARS[currentTaxYear];
+
+function setTaxYear(year) {
+  if (!TAX_YEARS[year]) return;
+  currentTaxYear = year;
+  TAX_CONFIG = TAX_YEARS[year];
+  document.querySelectorAll('.tax-year-pill').forEach(b => b.classList.toggle('active', b.dataset.year === year));
+  document.title = `UK Pension Contribution Comparison Tool — ${year}`;
+  // Update QE defaults to match tax year
+  const qeL = document.getElementById('qeLower');
+  const qeU = document.getElementById('qeUpper');
+  if (qeL && !document.getElementById('qualifyingEarnings').checked) {
+    qeL.value = TAX_CONFIG.qualifyingEarnings.lower;
+    qeU.value = TAX_CONFIG.qualifyingEarnings.upper;
+  }
+  recalculate();
+}
+
+function personalAllowance(assessedIncome) {
+  const pa = TAX_CONFIG.personalAllowance;
+  if (assessedIncome <= TAX_CONFIG.paTaperStart) return pa;
+  const reduction = Math.floor((assessedIncome - TAX_CONFIG.paTaperStart) / 2);
+  return Math.max(0, pa - reduction);
+}
+
+function calcIncomeTax(taxableIncome, isScottish) {
+  const bands = isScottish ? TAX_CONFIG.bands.scotland : TAX_CONFIG.bands.england;
+  let tax = 0, remaining = Math.max(0, taxableIncome);
+  for (const band of bands) {
+    const width = band.to === Infinity ? Infinity : band.to - band.from;
+    const taxed = Math.min(remaining, width);
+    tax += taxed * band.rate;
+    remaining -= taxed;
+    if (remaining <= 0) break;
+  }
+  return tax;
+}
+
+function calcEmployeeNI(niableIncome) {
+  const { pt, upt, employeeMain, employeeUpper } = TAX_CONFIG.ni;
+  if (niableIncome <= pt) return 0;
+  return (Math.min(niableIncome, upt) - pt) * employeeMain + Math.max(0, niableIncome - upt) * employeeUpper;
+}
+
+function calcEmployerNI(salary) {
+  return Math.max(0, salary - TAX_CONFIG.employerNI.threshold) * TAX_CONFIG.employerNI.rate;
+}
+
+function calcStudentLoan(income, plans) {
+  let total = 0;
+  for (const plan of plans) {
+    const c = TAX_CONFIG.studentLoans[plan];
+    if (c && income > c.threshold) total += (income - c.threshold) * c.rate;
+  }
+  return total;
+}
+
+function calcEmployerContribution(salary, employeeRate, config) {
+  let base = salary;
+  if (config.qualifyingEarnings) {
+    base = Math.max(0, Math.min(salary, config.qeUpper) - config.qeLower);
+  }
+  switch (config.mode) {
+    case 'flat': return base * (config.employerRate / 100);
+    case 'match': return base * Math.min(employeeRate / 100, config.matchCap / 100);
+    case 'basematch': return base * (config.baseRate / 100 + Math.min(employeeRate / 100, config.matchCap / 100));
+    default: return base * (config.employerRate / 100);
+  }
+}
+
+function compoundGrowth(annualContrib, years, rate) {
+  if (rate === 0) return annualContrib * years;
+  const r = rate / 100;
+  return annualContrib * ((Math.pow(1 + r, years) - 1) / r);
+}
+
+function calcTaperedAA(adjustedIncome) {
+  const aa = TAX_CONFIG.annualAllowance;
+  if (adjustedIncome <= aa.taperStart) return aa.standard;
+  return Math.max(aa.minimum, aa.standard - Math.floor((adjustedIncome - aa.taperStart) / 2));
+}
+
+// --- Method orchestrators ---
+
+function calcRAS(gross, employeeRate, employerConfig, studentPlans, isScottish) {
+  // Contribution % = payroll deduction — same amount leaves pay as Net Pay / SS
+  const deduction = gross * (employeeRate / 100);
+  const basicRateRelief = deduction * 0.20;  // HMRC adds 20% ON TOP into pension
+  const employerContrib = calcEmployerContribution(gross, employeeRate, employerConfig);
+
+  // Tax and NI on full gross (RAS doesn't reduce assessed income)
+  const pa = personalAllowance(gross);
+  const taxableIncome = Math.max(0, gross - pa);
+  const incomeTax = calcIncomeTax(taxableIncome, isScottish);
+  const employeeNI = calcEmployeeNI(gross);
+  const studentLoan = calcStudentLoan(gross, studentPlans);
+
+  // Higher rate reclaimable: difference between actual tax paid and hypothetical tax
+  // if the deduction had reduced assessed income (like Net Pay does)
+  const hypotheticalAssessed = gross - deduction;
+  const hypotheticalPA = personalAllowance(hypotheticalAssessed);
+  const hypotheticalTaxable = Math.max(0, hypotheticalAssessed - hypotheticalPA);
+  const hypotheticalTax = calcIncomeTax(hypotheticalTaxable, isScottish);
+  const totalTaxRelief = incomeTax - hypotheticalTax;
+  const higherRateReclaimable = Math.max(0, totalTaxRelief - basicRateRelief);
+
+  // Take-home: same deduction from pay as other methods
+  const takeHomePay = gross - deduction - incomeTax - employeeNI - studentLoan;
+
+  return {
+    method: 'Relief at Source', grossSalary: gross,
+    pensionContribution: deduction,            // What goes from payroll to pension provider
+    netCostToEmployee: deduction,              // Same deduction from pay as other methods
+    basicRateRelief,                           // HMRC adds this ON TOP into pension (20%)
+    employerContribution: employerContrib,
+    employerNIPassthrough: 0, taxableIncome, incomeTax, employeeNI, studentLoan,
+    takeHomePay,
+    takeHomeInclReclaim: takeHomePay + higherRateReclaimable,
+    totalIntoPension: deduction + basicRateRelief + employerContrib, // RAS genuinely gets more in pension
+    higherRateReclaimable,                     // Cash back via self-assessment (NOT in pension)
+    warnings: []
+  };
+}
+
+function calcNetPay(gross, employeeRate, employerConfig, studentPlans, isScottish) {
+  const grossContribution = gross * (employeeRate / 100);
+  const employerContrib = calcEmployerContribution(gross, employeeRate, employerConfig);
+  const assessedIncome = gross - grossContribution;
+  const pa = personalAllowance(assessedIncome);
+  const taxableIncome = Math.max(0, assessedIncome - pa);
+  const incomeTax = calcIncomeTax(taxableIncome, isScottish);
+  const employeeNI = calcEmployeeNI(gross);
+  const studentLoan = calcStudentLoan(gross, studentPlans);
+  const takeHomePay = gross - grossContribution - incomeTax - employeeNI - studentLoan;
+
+  return {
+    method: 'Net Pay Arrangement', grossSalary: gross,
+    pensionContribution: grossContribution,
+    netCostToEmployee: grossContribution,    // Full amount deducted from gross
+    basicRateRelief: 0,                       // Relief happens through reduced tax, not a top-up
+    employerContribution: employerContrib,
+    employerNIPassthrough: 0, taxableIncome, incomeTax, employeeNI, studentLoan,
+    takeHomePay,
+    takeHomeInclReclaim: takeHomePay,          // No reclaim needed
+    totalIntoPension: grossContribution + employerContrib,
+    higherRateReclaimable: 0, warnings: []
+  };
+}
+
+function calcSS(gross, employeeRate, employerConfig, studentPlans, isScottish, niPassthroughRate) {
+  const grossContribution = gross * (employeeRate / 100);
+  const reducedSalary = gross - grossContribution;
+  const employerContrib = calcEmployerContribution(gross, employeeRate, employerConfig);
+  const employerNISaving = calcEmployerNI(gross) - calcEmployerNI(reducedSalary);
+  const niPassthrough = employerNISaving * (niPassthroughRate / 100);
+  const pa = personalAllowance(reducedSalary);
+  const taxableIncome = Math.max(0, reducedSalary - pa);
+  const incomeTax = calcIncomeTax(taxableIncome, isScottish);
+  const employeeNI = calcEmployeeNI(reducedSalary);
+  const studentLoan = calcStudentLoan(reducedSalary, studentPlans);
+  const takeHomePay = reducedSalary - incomeTax - employeeNI - studentLoan;
+  const warnings = [];
+  if (reducedSalary < TAX_CONFIG.nmw) {
+    warnings.push({ type: 'warning', title: 'Below Minimum Wage', text: `Salary sacrifice would reduce your salary to £${Math.round(reducedSalary).toLocaleString()}, below the national minimum wage equivalent of £${TAX_CONFIG.nmw.toLocaleString()}. Your employer cannot legally allow this.` });
+  }
+
+  return {
+    method: 'Salary Sacrifice', grossSalary: gross,
+    pensionContribution: grossContribution,
+    netCostToEmployee: grossContribution,     // Sacrificed from salary
+    basicRateRelief: 0,                        // Relief through reduced salary, not a top-up
+    employerContribution: employerContrib,
+    employerNIPassthrough: niPassthrough, taxableIncome, incomeTax, employeeNI, studentLoan,
+    takeHomePay,
+    takeHomeInclReclaim: takeHomePay,           // No reclaim needed
+    totalIntoPension: grossContribution + employerContrib + niPassthrough,
+    higherRateReclaimable: 0, warnings
+  };
+}
+
+// --- Matrix helpers ---
+
+const MATRIX_DEFAULT_RATES = [3, 4, 5, 6, 8, 10, 12, 15, 17, 20, 25, 30];
+
+let matrixMethod = 'ras'; // 'ras' | 'ss'
+
+function setMatrixMethod(m) {
+  matrixMethod = m;
+  document.querySelectorAll('.matrix-method-pill').forEach(b => b.classList.toggle('active', b.dataset.method === m));
+  recalculate();
+}
+
+function getSalaryRange(baseSalary) {
+  let step, below, above;
+  if (baseSalary <= 25000)       { step = 1000;  below = 3; above = 5; }
+  else if (baseSalary <= 50000)  { step = 2500;  below = 3; above = 5; }
+  else if (baseSalary <= 80000)  { step = 5000;  below = 3; above = 5; }
+  else if (baseSalary <= 150000) { step = 5000;  below = 3; above = 6; }
+  else if (baseSalary <= 300000) { step = 10000; below = 3; above = 5; }
+  else                           { step = 25000; below = 3; above = 5; }
+
+  // Special: force £5k for PA taper zone
+  if (baseSalary >= 100000 && baseSalary <= 125140) { step = 5000; }
+
+  const snapped = Math.round(baseSalary / step) * step;
+  const salaries = [];
+  for (let i = -below; i <= above; i++) {
+    const s = snapped + i * step;
+    if (s > 0) salaries.push(s);
+  }
+  // Insert user's exact salary if not already present
+  if (!salaries.includes(baseSalary) && baseSalary > 0) {
+    salaries.push(baseSalary);
+    salaries.sort((a, b) => a - b);
+  }
+  return salaries;
+}
+
+function getMatrixRates(userRate) {
+  const rates = [...MATRIX_DEFAULT_RATES];
+  if (userRate > 0 && !rates.includes(userRate)) {
+    // Find nearest and replace
+    let nearIdx = 0, nearDist = Math.abs(rates[0] - userRate);
+    for (let i = 1; i < rates.length; i++) {
+      const d = Math.abs(rates[i] - userRate);
+      if (d < nearDist) { nearDist = d; nearIdx = i; }
+    }
+    rates[nearIdx] = userRate;
+    rates.sort((a, b) => a - b);
+  }
+  return rates;
+}
+
+function renderMatrix(inp) {
+  const salaries = getSalaryRange(inp.salary);
+  const rates = getMatrixRates(inp.employeeRate);
+  const period = inp.period;
+  const isRAS = matrixMethod === 'ras';
+  const calcFn = isRAS
+    ? (sal, rate) => calcRAS(sal, rate, inp.employerConfig, inp.studentPlans, inp.isScottish)
+    : (sal, rate) => calcSS(sal, rate, inp.employerConfig, inp.studentPlans, inp.isScottish, inp.niPassRate);
+
+  // Build header
+  let html = `<table class="matrix-table"><thead><tr>`;
+  html += `<th><div>Gross<br>Salary</div></th>`;
+  for (const r of rates) {
+    const isActiveCol = Math.abs(r - inp.employeeRate) < 0.01;
+    html += `<th class="${isActiveCol ? 'matrix-col--active' : ''}"><span class="matrix-col-pct">${r}%</span><span class="matrix-col-label">Employee</span></th>`;
+  }
+  html += '</tr></thead><tbody>';
+
+  // Build rows
+  for (const sal of salaries) {
+    const isUserSalary = sal === inp.salary;
+    let rowClass = isUserSalary ? 'matrix-row--active' : '';
+
+    html += `<tr class="${rowClass}">`;
+    html += `<td><span class="matrix-sal-label">GROSS</span><br><span class="matrix-sal-val">£${sal.toLocaleString('en-GB')}</span>`;
+    if (isUserSalary) html += `<br><span class="matrix-sal-pinned">▸ YOU</span>`;
+    html += `</td>`;
+
+    for (const r of rates) {
+      const result = calcFn(sal, r);
+      const isActiveCol = Math.abs(r - inp.employeeRate) < 0.01;
+      const isCrosshair = isUserSalary && isActiveCol;
+
+      // Trap zone: is the assessed income in the PA taper zone (£100k–£125,140)?
+      // For RAS, assessed = gross salary (contribution doesn't reduce it).
+      // For SS, assessed = gross - sacrifice (varies by rate).
+      const assessedIncome = isRAS ? sal : sal - sal * (r / 100);
+      const inTrap = assessedIncome > TAX_CONFIG.paTaperStart && assessedIncome < 125140;
+
+      const tdClasses = [];
+      if (isActiveCol) tdClasses.push('matrix-col--active');
+      if (inTrap) tdClasses.push('matrix-trap-cell');
+
+      const cellClass = 'matrix-cell' + (isCrosshair ? ' matrix-cell--crosshair' : '');
+
+      const thp = fmt(result.takeHomePay, period);
+      const pension = fmt(result.totalIntoPension, period);
+
+      html += `<td class="${tdClasses.join(' ')}">`;
+      html += `<div class="${cellClass}">`;
+      html += `<div class="matrix-cell__thp">${thp}</div>`;
+      html += `<div class="matrix-cell__pension"><span>pension </span>${pension}</div>`;
+      html += `</div></td>`;
+    }
+    html += '</tr>';
+  }
+  html += '</tbody></table>';
+
+  const matrixContainer = document.getElementById('matrixDesktop');
+  matrixContainer.innerHTML = html;
+
+  // Auto-scroll to crosshair cell so the user's position is visible
+  const crosshairEl = matrixContainer.querySelector('.matrix-cell--crosshair');
+  if (crosshairEl) {
+    const td = crosshairEl.closest('td');
+    if (td) {
+      // Center the cell horizontally in the scroll container
+      const scrollLeft = td.offsetLeft - matrixContainer.clientWidth / 2 + td.offsetWidth / 2;
+      matrixContainer.scrollLeft = Math.max(0, scrollLeft);
+    }
+  }
+
+  // Employer note
+  const noteEl = document.getElementById('matrixEmployerNote');
+  const ec = inp.employerConfig;
+  if (ec.mode === 'flat') {
+    noteEl.textContent = `Employer contributes fixed ${ec.employerRate}% of gross salary`;
+  } else if (ec.mode === 'match') {
+    noteEl.textContent = `Employer matches employee contribution up to ${ec.matchCap}%`;
+  } else {
+    noteEl.textContent = `Employer contributes ${ec.baseRate}% base + matches up to ${ec.matchCap}%`;
+  }
+  if (ec.qualifyingEarnings) noteEl.textContent += ' (qualifying earnings band)';
+
+  // Mobile version
+  renderMatrixMobile(inp, salaries, rates);
+}
+
+function renderMatrixMobile(inp, salaries, rates) {
+  const period = inp.period;
+  const isRAS = matrixMethod === 'ras';
+  const calcFn = isRAS
+    ? (sal, rate) => calcRAS(sal, rate, inp.employerConfig, inp.studentPlans, inp.isScottish)
+    : (sal, rate) => calcSS(sal, rate, inp.employerConfig, inp.studentPlans, inp.isScottish, inp.niPassRate);
+
+  const userRate = inp.employeeRate;
+  let html = `<div style="text-align:center;margin-bottom:12px;font-size:12px;color:var(--text-tertiary)">At ${userRate}% contribution rate</div>`;
+
+  for (const sal of salaries) {
+    const result = calcFn(sal, userRate);
+    const isActive = sal === inp.salary;
+    const thp = fmt(result.takeHomePay, period);
+    const pension = fmt(result.totalIntoPension, period);
+    html += `<div class="matrix-mobile-card${isActive ? ' matrix-mobile-card--active' : ''}">`;
+    html += `<div class="matrix-mobile-salary">£${sal.toLocaleString('en-GB')}${isActive ? '<br><span style="font-size:9px;color:var(--info);font-weight:600">▸ YOU</span>' : ''}</div>`;
+    html += `<div class="matrix-mobile-values">`;
+    html += `<div class="matrix-mobile-thp">${thp}</div>`;
+    html += `<div class="matrix-mobile-pension">pension ${pension}</div>`;
+    html += `</div></div>`;
+  }
+
+  document.getElementById('matrixMobile').innerHTML = html;
+}
+
+// --- Insight generator ---
+
+function generateInsights(ras, netpay, ss, gross, employeeRate, employerConfig) {
+  const insights = [];
+
+  if (gross > 100000 && gross <= 125140) {
+    insights.push({ type: 'warning', icon: '!!', title: 'You\'re in the 60% Tax Trap', text: `Between £100k and £125,140 you lose £1 of personal allowance for every £2 earned — creating an effective 60% marginal tax rate. Salary sacrifice can move your assessed income below £100k, restoring your full personal allowance.` });
+  }
+
+  if (gross > 50270 && ras.higherRateReclaimable > 0) {
+    insights.push({ type: 'info', icon: 'i', title: 'Don\'t Forget Higher Rate Relief', text: `On Relief at Source, you can reclaim £${Math.round(ras.higherRateReclaimable).toLocaleString()}/year via self-assessment. This is cash back to you — it doesn't go into your pension automatically. You could choose to reinvest it, but many people forget to claim entirely.` });
+  }
+
+  if (gross > 100000 && personalAllowance(gross) < TAX_CONFIG.personalAllowance) {
+    const paLost = TAX_CONFIG.personalAllowance - personalAllowance(gross);
+    const npAssessed = gross - ras.pensionContribution;
+    const npPA = personalAllowance(npAssessed);
+    if (npPA > personalAllowance(gross)) {
+      const restored = npPA - personalAllowance(gross);
+      insights.push({ type: 'warning', icon: '!!', title: 'Personal Allowance Taper Hurts RAS', text: `RAS doesn't reduce your assessed income, so you lose £${paLost.toLocaleString()} of personal allowance. Net Pay and Salary Sacrifice reduce assessed income to £${npAssessed.toLocaleString()}, restoring £${Math.round(restored).toLocaleString()} of allowance. This dramatically impacts your take-home pay.` });
+    }
+  }
+
+  const niSaving = ras.employeeNI - ss.employeeNI;
+  if (niSaving > 50) {
+    insights.push({ type: 'success', icon: '+', title: 'National Insurance Saving', text: `Salary sacrifice saves you £${Math.round(niSaving).toLocaleString()}/year in employee NI contributions that the other methods can't avoid.` });
+  }
+
+  if (ss.employerNIPassthrough > 0) {
+    insights.push({ type: 'success', icon: '+', title: 'Employer NI Pass-through', text: `Your employer is passing through £${Math.round(ss.employerNIPassthrough).toLocaleString()}/year of their NI saving into your pension.` });
+  }
+
+  const slSaving = ras.studentLoan - ss.studentLoan;
+  if (slSaving > 50) {
+    insights.push({ type: 'success', icon: '+', title: 'Student Loan Reduction', text: `Salary sacrifice reduces your student loan repayment by £${Math.round(slSaving).toLocaleString()}/year by lowering your assessable income.` });
+  }
+
+  if ((employerConfig.mode === 'match' || employerConfig.mode === 'basematch') && employeeRate < employerConfig.matchCap) {
+    const additional = employerConfig.matchCap - employeeRate;
+    insights.push({ type: 'warning', icon: '!!', title: 'Free Money on the Table', text: `Your employer matches up to ${employerConfig.matchCap}% but you're only contributing ${employeeRate}%. Increase by ${additional}% to unlock the full match.` });
+  }
+
+  if (employerConfig.qualifyingEarnings && gross > employerConfig.qeUpper) {
+    const rate = employerConfig.employerRate || employerConfig.matchCap || 3;
+    const fullContrib = gross * rate / 100;
+    const qeContrib = Math.max(0, Math.min(gross, employerConfig.qeUpper) - employerConfig.qeLower) * rate / 100;
+    const diff = fullContrib - qeContrib;
+    if (diff > 100) {
+      insights.push({ type: 'info', icon: 'i', title: 'Qualifying Earnings Impact', text: `Your employer calculates on the £${employerConfig.qeLower.toLocaleString()}–£${employerConfig.qeUpper.toLocaleString()} band, not full salary. This reduces employer contributions by ~£${Math.round(diff).toLocaleString()}/year vs full salary basis.` });
+    }
+  }
+
+  const totalPension = Math.max(ras.totalIntoPension, netpay.totalIntoPension, ss.totalIntoPension);
+  const aa = calcTaperedAA(gross);
+  if (totalPension > aa) {
+    insights.push({ type: 'warning', icon: '!!', title: 'Annual Allowance Breach', text: `Total pension contributions of £${Math.round(totalPension).toLocaleString()} exceed your annual allowance of £${aa.toLocaleString()}. The excess will be taxed at your marginal rate.` });
+  }
+
+  if (ss.pensionContribution > 0) {
+    insights.push({ type: 'info', icon: 'i', title: 'Salary Sacrifice Considerations', text: `SS reduces your contractual salary, which can affect mortgage affordability assessments, life insurance multiples, and statutory benefits (maternity/sick pay).` });
+  }
+
+  for (const w of ss.warnings) {
+    insights.push({ type: w.type, icon: '!!', title: w.title, text: w.text });
+  }
+
+  return insights;
+}
+
+// ===================================================================
+// UI CONTROLLER
+// ===================================================================
+
+let currentResults = { ras: null, netpay: null, ss: null };
+let activeTab = 'ras';
+let animationFrame = null;
+let contribDisplay = 'percent';
+let exactRate = 17; // precise rate — NOT constrained by slider step
+let compareMode = 'same-rate'; // 'same-rate' | 'same-takehome'
+
+// --- Solver: find contribution rate that matches a target take-home pay ---
+function solveForTakeHome(targetTakeHome, methodCalc, gross, employerConfig, studentPlans, isScottish, niPassRate) {
+  if (targetTakeHome >= gross) return 0; // can't match if target is above gross
+  let lo = 0, hi = 60;
+  // Check if even 0% contribution gives lower take-home (shouldn't happen, but safety)
+  const atZero = methodCalc(gross, 0, employerConfig, studentPlans, isScottish, niPassRate);
+  if (atZero.takeHomePay <= targetTakeHome) return 0;
+  // Check if max rate overshoots
+  const atMax = methodCalc(gross, hi, employerConfig, studentPlans, isScottish, niPassRate);
+  if (atMax.takeHomePay >= targetTakeHome) return hi;
+  // Binary search: higher rate → lower take-home
+  for (let i = 0; i < 50; i++) {
+    const mid = (lo + hi) / 2;
+    const result = methodCalc(gross, mid, employerConfig, studentPlans, isScottish, niPassRate);
+    if (result.takeHomePay > targetTakeHome) lo = mid;
+    else hi = mid;
+  }
+  return Math.round((lo + hi) / 2 * 100) / 100; // round to 2dp
+}
+
+function setCompareMode(mode) {
+  compareMode = mode;
+  document.querySelectorAll('.compare-mode__pill').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  const hint = document.getElementById('compareModeHint');
+  hint.textContent = mode === 'same-takehome' ? 'RAS rate adjusted down to match SS take-home' : '';
+  recalculate();
+}
+
+function parseSalary() {
+  return parseFloat(document.getElementById('salary').value.replace(/[^0-9.]/g, '')) || 0;
+}
+
+function getEmployeeRate() {
+  return exactRate;
+}
+
+// Sync the text input to match the slider value in current display format
+function syncContribDisplay() {
+  const input = document.getElementById('contribInput');
+  if (contribDisplay === 'percent') {
+    const display = Math.round(exactRate * 10) / 10;
+    input.value = display + '%';
+  } else {
+    const salary = parseSalary();
+    const period = parseInt(document.getElementById('period').value);
+    const annual = salary * exactRate / 100;
+    const perPeriod = Math.round(annual / period);
+    input.value = '£' + perPeriod.toLocaleString('en-GB');
+  }
+  // Keep slider in sync visually
+  document.getElementById('contribSlider').value = exactRate;
+}
+
+function getInputs() {
+  const salary = parseSalary();
+  const employeeRate = getEmployeeRate();
+  const period = parseInt(document.getElementById('period').value);
+  const isScottish = document.getElementById('scottish').checked;
+  const mode = document.getElementById('employerMode').value;
+  const employerRate = parseFloat(document.getElementById('employerRate').value) || 0;
+  const matchCap = parseFloat(document.getElementById('matchCap').value) || 0;
+  const baseRate = parseFloat(document.getElementById('baseRate').value) || 0;
+  const useQE = document.getElementById('qualifyingEarnings').checked;
+  const qeLower = parseFloat(document.getElementById('qeLower').value) || TAX_CONFIG.qualifyingEarnings.lower;
+  const qeUpper = parseFloat(document.getElementById('qeUpper').value) || TAX_CONFIG.qualifyingEarnings.upper;
+  const niPassthrough = document.getElementById('niPassthrough').checked;
+  const niPassRate = niPassthrough ? (parseFloat(document.getElementById('niPassRate').value) || 0) : 0;
+  const loanChecks = document.querySelectorAll('.loan-check input:checked');
+  const studentPlans = Array.from(loanChecks).map(c => c.value);
+  const projYears = parseInt(document.getElementById('projYears').value) || 25;
+  const projGrowth = parseFloat(document.getElementById('projGrowth').value) || 5;
+
+  return {
+    salary, employeeRate, period, isScottish,
+    employerConfig: { mode, employerRate, matchCap, baseRate, qualifyingEarnings: useQE, qeLower, qeUpper },
+    studentPlans, niPassRate, projYears, projGrowth
+  };
+}
+
+function recalculate() {
+  if (animationFrame) cancelAnimationFrame(animationFrame);
+  animationFrame = requestAnimationFrame(_recalculate);
+}
+
+function _recalculate() {
+  const inp = getInputs();
+  if (inp.salary <= 0) return;
+
+  let ras, netpay, ss, rasRate, npRate, ssRate;
+
+  if (compareMode === 'same-takehome' && inp.employeeRate > 0) {
+    // Anchor: SS and NP use the user's input rate. Solve RAS down to match SS take-home.
+    ssRate = inp.employeeRate;
+    npRate = inp.employeeRate;
+    ss = calcSS(inp.salary, ssRate, inp.employerConfig, inp.studentPlans, inp.isScottish, inp.niPassRate);
+    netpay = calcNetPay(inp.salary, npRate, inp.employerConfig, inp.studentPlans, inp.isScottish);
+
+    // Solve: what RAS rate gives the same take-home as SS?
+    const targetTHP = ss.takeHomePay;
+    rasRate = solveForTakeHome(targetTHP, calcRAS, inp.salary, inp.employerConfig, inp.studentPlans, inp.isScottish, 0);
+    ras = calcRAS(inp.salary, rasRate, inp.employerConfig, inp.studentPlans, inp.isScottish);
+  } else {
+    rasRate = inp.employeeRate;
+    npRate = inp.employeeRate;
+    ssRate = inp.employeeRate;
+    ras = calcRAS(inp.salary, inp.employeeRate, inp.employerConfig, inp.studentPlans, inp.isScottish);
+    netpay = calcNetPay(inp.salary, inp.employeeRate, inp.employerConfig, inp.studentPlans, inp.isScottish);
+    ss = calcSS(inp.salary, inp.employeeRate, inp.employerConfig, inp.studentPlans, inp.isScottish, inp.niPassRate);
+  }
+
+  currentResults = { ras, netpay, ss };
+
+  // Update rate badges
+  updateRateBadges(rasRate, npRate, ssRate, inp.employeeRate);
+
+  renderCards(ras, netpay, ss, inp.period);
+  renderRuler(ras, netpay, ss, inp.isScottish);
+  renderExplainers(ras, netpay, ss);
+  renderProjection(ras, netpay, ss, inp.projYears, inp.projGrowth);
+  renderInsights(ras, netpay, ss, inp.salary, inp.employeeRate, inp.employerConfig);
+  renderMatrix(inp);
+  updateURL(inp);
+}
+
+function updateRateBadges(rasRate, npRate, ssRate, inputRate) {
+  const isMatched = compareMode === 'same-takehome' && inputRate > 0;
+  const fmtRate = r => (Math.round(r * 10) / 10) + '%';
+
+  const rasBadge = document.getElementById('rateBadgeRas');
+  const npBadge = document.getElementById('rateBadgeNetpay');
+  const ssBadge = document.getElementById('rateBadgeSs');
+
+  if (isMatched) {
+    rasBadge.innerHTML = `<span class="matched-rate">${fmtRate(rasRate)}</span> to match take-home`;
+    rasBadge.classList.add('visible');
+    npBadge.innerHTML = `<span class="matched-rate">${fmtRate(npRate)}</span> contribution`;
+    npBadge.classList.add('visible');
+    ssBadge.innerHTML = `<span class="matched-rate">${fmtRate(ssRate)}</span> contribution`;
+    ssBadge.classList.add('visible');
+  } else {
+    rasBadge.classList.remove('visible');
+    npBadge.classList.remove('visible');
+    ssBadge.classList.remove('visible');
+  }
+}
+
+// --- Formatting ---
+
+function fmt(amount, period) {
+  const val = amount / period;
+  if (period === 1) return '£' + Math.round(val).toLocaleString('en-GB');
+  if (period === 365) return '£' + val.toFixed(2);
+  return '£' + Math.round(val).toLocaleString('en-GB');
+}
+
+function fmtDelta(amount, period) {
+  const val = Math.round(amount / period);
+  if (val === 0) return null;
+  const sign = val > 0 ? '+' : '';
+  return sign + '£' + Math.abs(val).toLocaleString('en-GB');
+}
+
+// --- Card rendering with deltas vs RAS baseline ---
+// Every card renders the EXACT same rows in the same order.
+// Rows that don't apply to a method show as invisible placeholders to keep alignment.
+
+function buildCardHTML(result, rasResult, period, flags) {
+  // flags: { hasStudentLoan, hasNIPass, hasReclaim }
+  const isRAS = result.method === 'Relief at Source';
+  const isNotRAS = !isRAS;
+  const rows = [];
+
+  function addRow(label, value, opts = {}) {
+    rows.push({ label, value, ...opts });
+  }
+  function addDivider() { rows.push({ divider: true }); }
+
+  // EVERY card renders the EXACT same rows, ALWAYS. No conditional rows.
+  // Math must be verifiable: Take-Home = Gross - Pension Deducted - Tax - NI
+  addRow('Gross Salary', result.grossSalary);
+  addRow('Pension Deducted', result.netCostToEmployee);
+  addRow('Taxable Income', result.taxableIncome, { dim: true });
+  addRow('Income Tax', result.incomeTax, { dim: true });
+  addRow('NI', result.employeeNI, { dim: true });
+  if (flags.hasStudentLoan) {
+    addRow('Student Loan', result.studentLoan, { dim: true, dash: result.studentLoan === 0 });
+  }
+  const totalTaxNI = result.incomeTax + result.employeeNI + result.studentLoan;
+  const totalTaxDelta = isNotRAS ? totalTaxNI - (rasResult.incomeTax + rasResult.employeeNI + rasResult.studentLoan) : null;
+  addRow('Total Tax & NI', totalTaxNI, { highlight: true, delta: totalTaxDelta, placeholderDelta: isRAS });
+  addDivider();
+
+  // Take-Home = Gross - Pension Deducted - Tax - NI
+  const thpDelta = isNotRAS ? result.takeHomePay - rasResult.takeHomePay : null;
+  addRow('Take-Home Pay', result.takeHomePay, { highlight: true, delta: thpDelta, placeholderDelta: isRAS });
+
+  // Tax reclaim & eff take-home — ALWAYS shown, "—" when N/A
+  addRow('Tax Reclaim', isRAS ? result.higherRateReclaimable : 0, {
+    dash: !isRAS || result.higherRateReclaimable === 0, dim: true
+  });
+  const effDelta = isNotRAS ? result.takeHomeInclReclaim - rasResult.takeHomeInclReclaim : null;
+  addRow('Eff. Take-Home', isRAS ? result.takeHomeInclReclaim : result.takeHomePay, {
+    highlight: true, delta: effDelta, placeholderDelta: isRAS
+  });
+
+  addDivider();
+  // Pension section — what ends up in the pot
+  addRow('Into Pension', result.pensionContribution);
+  addRow('HMRC Relief', isRAS ? result.basicRateRelief : 0, {
+    dash: !isRAS || result.basicRateRelief === 0, dim: true
+  });
+  addRow('Employer', result.employerContribution);
+  if (flags.hasNIPass) {
+    addRow('NI Pass-through', result.employerNIPassthrough, { dash: result.employerNIPassthrough === 0 });
+  }
+  addDivider();
+  const pipDelta = isNotRAS ? result.totalIntoPension - rasResult.totalIntoPension : null;
+  addRow('Total Pension', result.totalIntoPension, { highlight: true, delta: pipDelta, placeholderDelta: isRAS });
+
+  // Render HTML
+  return rows.map(r => {
+    if (r.divider) return '<hr class="card__divider">';
+    const cls = r.highlight ? 'card__row card__highlight' : 'card__row';
+    const dimStyle = r.dim ? ' style="color:var(--text-tertiary)"' : '';
+    const valueText = r.dash ? '—' : fmt(r.value, period);
+
+    let deltaHTML = '';
+    if (r.delta !== null && r.delta !== undefined && r.delta !== 0) {
+      const sign = r.delta > 0 ? '+' : '';
+      const deltaVal = Math.round(r.delta / period);
+      const cls2 = r.delta > 0 ? 'card__delta--positive' : 'card__delta--negative';
+      deltaHTML = `<span class="card__delta ${cls2}">${sign}£${Math.abs(deltaVal).toLocaleString('en-GB')}</span>`;
+    } else if (r.placeholderDelta) {
+      // Invisible spacer so RAS card aligns with cards that have deltas
+      deltaHTML = `<span class="card__delta" style="visibility:hidden">+£0</span>`;
+    }
+
+    return `<div class="${cls}">
+      <span class="card__row-label">${r.label}</span>
+      <div><span class="card__row-value"${dimStyle}>${valueText}</span>${deltaHTML}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderCards(ras, netpay, ss, period) {
+  const flags = {
+    hasStudentLoan: ras.studentLoan > 0 || netpay.studentLoan > 0 || ss.studentLoan > 0,
+    hasNIPass: ss.employerNIPassthrough > 0
+  };
+  document.getElementById('rowsRas').innerHTML = buildCardHTML(ras, ras, period, flags);
+  document.getElementById('rowsNetpay').innerHTML = buildCardHTML(netpay, ras, period, flags);
+  document.getElementById('rowsSs').innerHTML = buildCardHTML(ss, ras, period, flags);
+}
+
+function buildTaxSegments(assessedIncome, isScottish) {
+  const bands = isScottish ? TAX_CONFIG.bands.scotland : TAX_CONFIG.bands.england;
+  const pa = personalAllowance(assessedIncome);
+  const segments = [];
+
+  if (pa > 0) {
+    segments.push({ name: '0%', width: Math.min(pa, assessedIncome), rate: 0, color: '#22c55e' });
+  }
+
+  const inTrap = assessedIncome > TAX_CONFIG.paTaperStart && pa < TAX_CONFIG.personalAllowance;
+  let covered = pa;
+
+  for (const band of bands) {
+    const bandStart = band.from + pa;
+    const bandEnd = band.to === Infinity ? assessedIncome : band.to + pa;
+    if (covered >= assessedIncome) break;
+    const segStart = Math.max(covered, bandStart);
+    const segEnd = Math.min(assessedIncome, bandEnd);
+    const width = segEnd - segStart;
+    if (width <= 0) continue;
+
+    const trapStart = TAX_CONFIG.paTaperStart;
+    const trapEnd = TAX_CONFIG.paTaperStart + TAX_CONFIG.personalAllowance * 2;
+
+    if (inTrap && segStart < trapEnd && segEnd > trapStart) {
+      if (segStart < trapStart) {
+        segments.push({ name: `${band.rate * 100}%`, width: trapStart - segStart, rate: band.rate, color: band.color });
+      }
+      const tStart = Math.max(segStart, trapStart);
+      const tEnd = Math.min(segEnd, trapEnd);
+      if (tEnd > tStart) {
+        segments.push({ name: '60%', width: tEnd - tStart, rate: 0.60, color: '#ff6b35', trap: true });
+      }
+      if (segEnd > trapEnd) {
+        segments.push({ name: `${band.rate * 100}%`, width: segEnd - trapEnd, rate: band.rate, color: band.color });
+      }
+    } else {
+      segments.push({ name: `${band.rate * 100}%`, width, rate: band.rate, color: band.color });
+    }
+    covered = segEnd;
+  }
+  return segments;
+}
+
+function renderRuler(ras, netpay, ss, isScottish) {
+  // RAS assessed income = gross (always), but in match mode the deduction differs
+  const rasAssessed = ras.grossSalary; // RAS always taxed on full gross
+  const npAssessed = netpay.grossSalary - netpay.pensionContribution;
+  const ssAssessed = ss.grossSalary - ss.pensionContribution;
+  const maxIncome = Math.max(rasAssessed, npAssessed, ssAssessed);
+
+  const rasSegments = buildTaxSegments(rasAssessed, isScottish);
+  const npSegments = buildTaxSegments(npAssessed, isScottish);
+
+  // In match mode NP/SS may differ; in same-rate they're always identical
+  const npAndSsSame = Math.abs(npAssessed - ssAssessed) < 1;
+
+  const bars = [
+    { label: 'RAS', color: 'var(--ras)', segments: rasSegments, income: rasAssessed },
+  ];
+  if (npAndSsSame) {
+    bars.push({ label: 'Net Pay / SS', color: 'var(--netpay)', segments: npSegments, income: npAssessed });
+  } else {
+    bars.push({ label: 'Net Pay', color: 'var(--netpay)', segments: npSegments, income: npAssessed });
+    bars.push({ label: 'Sal. Sacrifice', color: 'var(--ss)', segments: buildTaxSegments(ssAssessed, isScottish), income: ssAssessed });
+  }
+
+  function renderBar(segments, barIncome) {
+    const totalWidth = segments.reduce((sum, s) => sum + s.width, 0);
+    return segments.map(s => {
+      const pct = (s.width / totalWidth * 100);
+      // For label visibility, use proportion of full container (accounts for shorter bars)
+      const visPct = (s.width / maxIncome * 100);
+      const trapClass = s.trap ? ' trap-zone' : '';
+      const amountStr = '£' + (s.width >= 1000 ? Math.round(s.width / 1000) + 'k' : Math.round(s.width));
+      const showLabels = visPct > 8;
+      return `<div class="ruler-segment${trapClass}" style="width:${pct.toFixed(2)}%;background:${s.color}">${showLabels ? `<span class="ruler-segment__rate">${s.name}</span><span class="ruler-segment__amount">${amountStr}</span>` : ''}</div>`;
+    }).join('');
+  }
+
+  const barsContainer = document.getElementById('rulerBars');
+  barsContainer.innerHTML = bars.map(b => {
+    const barWidthPct = (b.income / maxIncome * 100).toFixed(1);
+    const totalStr = '£' + Math.round(b.income).toLocaleString('en-GB');
+    return `<div class="ruler-row">
+      <div class="ruler-row-header">
+        <div class="ruler-row-label" style="color:${b.color}">${b.label}</div>
+        <span class="ruler-row-total">${totalStr}</span>
+      </div>
+      <div class="ruler-row-bar-wrap">
+        <div class="ruler-bar" style="width:${barWidthPct}%">${renderBar(b.segments, b.income)}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Legend — collect unique bands from RAS (longest, has all bands)
+  const unique = [];
+  const seen = new Set();
+  for (const s of rasSegments) {
+    if (!seen.has(s.name)) { seen.add(s.name); unique.push(s); }
+  }
+  document.getElementById('rulerLegend').innerHTML = unique.map(s => {
+    return `<div class="ruler-legend-item"><div class="ruler-legend-swatch" style="background:${s.color}"></div>${s.name}${s.trap ? ' (PA taper)' : ''}</div>`;
+  }).join('');
+}
+
+function renderExplainers(ras, netpay, ss) {
+  const grid = document.getElementById('explainerGrid');
+  const deductionStr = '£' + Math.round(ras.pensionContribution).toLocaleString('en-GB');
+  const reliefStr = '£' + Math.round(ras.basicRateRelief).toLocaleString('en-GB');
+  const totalRASPension = '£' + Math.round(ras.pensionContribution + ras.basicRateRelief).toLocaleString('en-GB');
+  const reclaimStr = '£' + Math.round(ras.higherRateReclaimable).toLocaleString('en-GB');
+  const npPensionStr = '£' + Math.round(netpay.pensionContribution).toLocaleString('en-GB');
+
+  const cards = [];
+
+  // Card 1: Same deduction, different routing
+  cards.push({
+    title: 'Same deduction, different routing',
+    type: 'info',
+    text: `${deductionStr}/year is deducted from your pay under all three methods. With RAS, HMRC adds ${reliefStr} (20%) into your pension on top — your pension receives ${totalRASPension}/year. With Net Pay and Salary Sacrifice, the full deduction goes straight in (${npPensionStr}/year) — no top-up needed because tax relief happens at source.`
+  });
+
+  // Card 2: The take-home trade-off
+  if (ras.higherRateReclaimable > 0) {
+    cards.push({
+      title: 'The take-home trade-off',
+      type: 'info',
+      text: `Net Pay and Salary Sacrifice reduce your taxable income, so you pay less tax immediately. RAS doesn't — you pay full tax and reclaim the difference later via self-assessment (${reclaimStr}/year at your salary). Bigger pension pot (RAS) vs more cash in hand (Net Pay/SS).`
+    });
+  } else {
+    cards.push({
+      title: 'The take-home trade-off',
+      type: 'info',
+      text: `Net Pay and Salary Sacrifice reduce your taxable income, so you pay less tax immediately. RAS doesn't — but at your salary there's no higher-rate relief to reclaim. The main advantage of RAS is the HMRC top-up into your pension.`
+    });
+  }
+
+  // Card 3: 60% trap (conditional)
+  const gross = ras.grossSalary;
+  if (gross > 100000 && gross <= 125140) {
+    const paLost = TAX_CONFIG.personalAllowance - personalAllowance(gross);
+    const effectiveSalary = gross - ras.pensionContribution;
+    const restored = personalAllowance(effectiveSalary) - personalAllowance(gross);
+    if (restored > 0) {
+      cards.push({
+        title: 'The 60% trap',
+        type: 'warning',
+        text: `At £${Math.round(gross).toLocaleString('en-GB')}, you lose £${Math.round(paLost).toLocaleString('en-GB')} of your personal allowance to the taper — an effective 60% tax rate. Net Pay and Salary Sacrifice reduce your assessed income below £100k, restoring £${Math.round(restored).toLocaleString('en-GB')} of allowance. RAS does not. This is the single biggest factor in the take-home difference.`
+      });
+    }
+  }
+
+  grid.innerHTML = cards.map(c => `
+    <div class="explainer-card${c.type === 'warning' ? ' explainer-card--warning' : ''}">
+      <div class="explainer-card__title">${c.title}</div>
+      <p>${c.text}</p>
+    </div>
+  `).join('');
+}
+
+function renderProjection(ras, netpay, ss, years, growthRate) {
+  const currentPot = parseFloat(document.getElementById('projCurrentPot').value.replace(/[^0-9.]/g, '')) || 0;
+  // Grow current pot + future contributions
+  const rate = growthRate / 100;
+  const grownCurrentPot = currentPot * Math.pow(1 + rate, years);
+
+  const rasPot = grownCurrentPot + compoundGrowth(ras.totalIntoPension, years, growthRate);
+  const npPot = grownCurrentPot + compoundGrowth(netpay.totalIntoPension, years, growthRate);
+  const ssPot = grownCurrentPot + compoundGrowth(ss.totalIntoPension, years, growthRate);
+
+  document.getElementById('projRas').textContent = '£' + Math.round(rasPot).toLocaleString('en-GB');
+  document.getElementById('projNetpay').textContent = '£' + Math.round(npPot).toLocaleString('en-GB');
+  document.getElementById('projSs').textContent = '£' + Math.round(ssPot).toLocaleString('en-GB');
+
+  // Find best pot — when SS and NP tie, prefer SS (more popular)
+  const pots = [
+    { name: 'SS', pot: ssPot, annual: ss.totalIntoPension },
+    { name: 'Net Pay', pot: npPot, annual: netpay.totalIntoPension },
+    { name: 'RAS', pot: rasPot, annual: ras.totalIntoPension }
+  ];
+  // Stable sort: SS comes first when tied with NP (same index order preserved)
+  pots.sort((a, b) => b.pot - a.pot);
+  const best = pots[0];
+  const worst = pots[pots.length - 1];
+  const diff = best.pot - worst.pot;
+
+  document.getElementById('projDiff').textContent = '£' + Math.round(diff).toLocaleString('en-GB');
+
+  if (diff < 100) {
+    const thpDiff = ss.takeHomeInclReclaim - ras.takeHomeInclReclaim;
+    document.getElementById('projContext').textContent = `All three methods produce similar pension pots. SS saves you ${fmt(Math.abs(thpDiff), 1)}/year in take-home pay via NI savings.`;
+  } else if (compareMode === 'same-takehome') {
+    const diffPerYear = fmt(best.annual - worst.annual, 1);
+    document.getElementById('projContext').textContent = `more in your pension at the same take-home pay — ${best.name} over ${years} years at ${growthRate}% growth (${diffPerYear}/yr extra)`;
+  } else {
+    const diffPerYear = fmt(best.annual - worst.annual, 1);
+    document.getElementById('projContext').textContent = `more in your pension with ${best.name} over ${years} years at ${growthRate}% growth (${diffPerYear}/yr more into the pot)`;
+  }
+}
+
+function renderInsights(ras, netpay, ss, gross, employeeRate, employerConfig) {
+  const insights = generateInsights(ras, netpay, ss, gross, employeeRate, employerConfig);
+  const section = document.getElementById('insightsSection');
+  const grid = document.getElementById('insightsGrid');
+  if (insights.length === 0) { section.style.display = 'none'; return; }
+  section.style.display = '';
+  grid.innerHTML = insights.map(i => `
+    <div class="insight-card insight-card--${i.type}">
+      <span class="insight-card__icon" style="font-family:var(--font-mono);font-weight:700">${i.icon}</span>
+      <div class="insight-card__body">
+        <div class="insight-card__title">${i.title}</div>
+        <div class="insight-card__text">${i.text}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// --- UI interactions ---
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeIcon').textContent = isDark ? '🌙' : '☀';
+  document.getElementById('themeLabel').textContent = isDark ? 'Dark' : 'Light';
+  localStorage.setItem('theme', isDark ? 'light' : 'dark');
+}
+
+function toggleAdvanced() {
+  document.getElementById('advPanel').classList.toggle('open');
+  document.getElementById('advArrow').classList.toggle('open');
+}
+
+
+function toggleQEFields() {
+  document.getElementById('qeFields').classList.toggle('visible', document.getElementById('qualifyingEarnings').checked);
+}
+
+function toggleNIPassField() {
+  document.getElementById('niPassthroughField').style.display = document.getElementById('niPassthrough').checked ? '' : 'none';
+}
+
+function updateEmployerFields() {
+  const mode = document.getElementById('employerMode').value;
+  const matchFields = document.getElementById('matchFields');
+  const baseField = document.getElementById('baseRateField');
+  if (mode === 'flat') { matchFields.classList.remove('visible'); }
+  else if (mode === 'match') { matchFields.classList.add('visible'); baseField.style.display = 'none'; }
+  else if (mode === 'basematch') { matchFields.classList.add('visible'); baseField.style.display = ''; }
+}
+
+function setContribMode(mode) {
+  contribDisplay = mode;
+  document.querySelectorAll('.contrib-mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  syncContribDisplay();
+}
+
+function switchTab(method) {
+  activeTab = method;
+  document.querySelectorAll('.mobile-tabs__tab').forEach(t => t.classList.toggle('active', t.dataset.method === method));
+  document.getElementById('cards').classList.toggle('show-all', method === 'all');
+  document.getElementById('cardRas').classList.toggle('mobile-visible', method === 'ras' || method === 'all');
+  document.getElementById('cardNetpay').classList.toggle('mobile-visible', method === 'netpay' || method === 'all');
+  document.getElementById('cardSs').classList.toggle('mobile-visible', method === 'ss' || method === 'all');
+}
+
+// --- Input event wiring ---
+
+const salaryInput = document.getElementById('salary');
+salaryInput.addEventListener('input', function() {
+  const pos = this.selectionStart;
+  const raw = this.value.replace(/[^0-9]/g, '');
+  const num = parseInt(raw) || 0;
+  const formatted = num.toLocaleString('en-GB');
+  const diff = formatted.length - this.value.length;
+  this.value = formatted;
+  this.setSelectionRange(pos + diff, pos + diff);
+  syncContribDisplay(); // update £ display when salary changes
+  recalculate();
+});
+
+const slider = document.getElementById('contribSlider');
+slider.addEventListener('input', function() {
+  exactRate = parseFloat(this.value) || 0;
+  syncContribDisplay();
+  recalculate();
+});
+
+const contribInput = document.getElementById('contribInput');
+contribInput.addEventListener('input', function() {
+  const raw = parseFloat(this.value.replace(/[^0-9.]/g, '')) || 0;
+  const salary = parseSalary();
+  if (contribDisplay === 'percent') {
+    exactRate = Math.min(40, Math.max(0, raw));
+  } else {
+    // raw is £ per period — convert to exact annual %
+    const period = parseInt(document.getElementById('period').value);
+    const annual = raw * period;
+    exactRate = salary > 0 ? Math.min(40, Math.max(0, (annual / salary) * 100)) : 0;
+  }
+  slider.value = exactRate;
+  recalculate();
+});
+contribInput.addEventListener('blur', function() {
+  syncContribDisplay();
+});
+contribInput.addEventListener('focus', function() {
+  this.value = this.value.replace(/[^0-9.]/g, '');
+  this.select();
+});
+
+document.getElementById('period').addEventListener('change', function() {
+  syncContribDisplay();
+  recalculate();
+});
+
+const potInput = document.getElementById('projCurrentPot');
+potInput.addEventListener('input', function() {
+  const pos = this.selectionStart;
+  const raw = this.value.replace(/[^0-9]/g, '');
+  const num = parseInt(raw) || 0;
+  const formatted = num === 0 ? '0' : num.toLocaleString('en-GB');
+  const diff = formatted.length - this.value.length;
+  this.value = formatted;
+  this.setSelectionRange(pos + diff, pos + diff);
+  recalculate();
+});
+potInput.addEventListener('focus', function() {
+  if (this.value === '0') { this.value = ''; }
+});
+
+// --- URL params ---
+
+function updateURL(inp) {
+  const params = new URLSearchParams();
+  params.set('s', Math.round(inp.salary));
+  params.set('r', Math.round(inp.employeeRate * 10) / 10);
+  if (inp.isScottish) params.set('sc', '1');
+  if (inp.employerConfig.mode !== 'flat') params.set('em', inp.employerConfig.mode);
+  params.set('er', inp.employerConfig.employerRate);
+  if (inp.employerConfig.matchCap) params.set('mc', inp.employerConfig.matchCap);
+  if (inp.employerConfig.baseRate) params.set('br', inp.employerConfig.baseRate);
+  if (inp.employerConfig.qualifyingEarnings) {
+    params.set('qe', '1');
+    params.set('ql', inp.employerConfig.qeLower);
+    params.set('qu', inp.employerConfig.qeUpper);
+  }
+  if (inp.studentPlans.length) params.set('sl', inp.studentPlans.join(','));
+  if (inp.niPassRate > 0) params.set('np', inp.niPassRate);
+  if (inp.period !== 12) params.set('p', inp.period);
+  if (compareMode === 'same-takehome') params.set('cm', 'th');
+  if (matrixMethod !== 'ras') params.set('mm', matrixMethod);
+  if (currentTaxYear !== '2026/27') params.set('ty', currentTaxYear);
+  const cpot = parseFloat(document.getElementById('projCurrentPot').value.replace(/[^0-9.]/g, '')) || 0;
+  if (cpot > 0) params.set('cp', Math.round(cpot));
+  history.replaceState(null, '', window.location.pathname + '?' + params.toString());
+}
+
+function loadFromURL() {
+  const p = new URLSearchParams(window.location.search);
+  if (p.has('ty') && TAX_YEARS[p.get('ty')]) setTaxYear(p.get('ty'));
+  if (!p.has('s')) return;
+  document.getElementById('salary').value = (parseInt(p.get('s')) || 120000).toLocaleString('en-GB');
+  const rate = parseFloat(p.get('r')) || 17;
+  exactRate = rate;
+  document.getElementById('contribSlider').value = rate;
+  document.getElementById('contribInput').value = rate + '%';
+  if (p.get('sc') === '1') document.getElementById('scottish').checked = true;
+  if (p.get('em')) { document.getElementById('employerMode').value = p.get('em'); updateEmployerFields(); }
+  if (p.has('er')) document.getElementById('employerRate').value = p.get('er');
+  if (p.has('mc')) document.getElementById('matchCap').value = p.get('mc');
+  if (p.has('br')) document.getElementById('baseRate').value = p.get('br');
+  if (p.get('qe') === '1') {
+    document.getElementById('qualifyingEarnings').checked = true;
+    toggleQEFields();
+    if (p.has('ql')) document.getElementById('qeLower').value = p.get('ql');
+    if (p.has('qu')) document.getElementById('qeUpper').value = p.get('qu');
+  }
+  if (p.has('sl')) {
+    const plans = p.get('sl').split(',');
+    document.querySelectorAll('.loan-check input').forEach(cb => { cb.checked = plans.includes(cb.value); });
+  }
+  if (p.has('np')) {
+    document.getElementById('niPassthrough').checked = true;
+    document.getElementById('niPassRate').value = p.get('np');
+    toggleNIPassField();
+  }
+  if (p.has('p')) document.getElementById('period').value = p.get('p');
+  if (p.has('cp')) document.getElementById('projCurrentPot').value = parseInt(p.get('cp')).toLocaleString('en-GB');
+  if (p.get('cm') === 'th') setCompareMode('same-takehome');
+  if (p.has('mm')) setMatrixMethod(p.get('mm'));
+}
+
+function copyShareLink() {
+  const btn = document.querySelector('.share-btn');
+  navigator.clipboard.writeText(window.location.href).then(() => {
+    btn.textContent = 'Link copied!';
+    setTimeout(() => { btn.textContent = 'Copy shareable link'; }, 2000);
+  });
+}
+
+// --- Init ---
+function init() {
+  const saved = localStorage.getItem('theme');
+  if (saved) {
+    document.documentElement.setAttribute('data-theme', saved);
+    document.getElementById('themeIcon').textContent = saved === 'dark' ? '☀' : '🌙';
+    document.getElementById('themeLabel').textContent = saved === 'dark' ? 'Light' : 'Dark';
+  }
+  loadFromURL();
+  recalculate();
+}
+
+init();
+</script>
+</body>
+</html>
