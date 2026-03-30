@@ -676,7 +676,7 @@ td.matrix-trap-cell .matrix-cell__thp { color: var(--danger); }
       <label class="input-label" for="salary">Gross Annual Salary</label>
       <div class="salary-input-wrap">
         <span class="salary-prefix">£</span>
-        <input type="text" id="salary" class="salary-input" value="120,000" inputmode="numeric" autocomplete="off">
+        <input type="text" id="salary" class="salary-input" value="90,000" inputmode="numeric" autocomplete="off">
       </div>
     </div>
 
@@ -684,9 +684,9 @@ td.matrix-trap-cell .matrix-cell__thp { color: var(--danger); }
       <label class="input-label">Employee Contribution</label>
       <div class="contrib-row">
         <div class="contrib-slider-wrap">
-          <input type="range" id="contribSlider" class="slider" min="0" max="40" step="0.01" value="17">
+          <input type="range" id="contribSlider" class="slider" min="0" max="40" step="0.01" value="5">
         </div>
-        <input type="text" id="contribInput" class="contrib-input" value="17%" autocomplete="off">
+        <input type="text" id="contribInput" class="contrib-input" value="5%" autocomplete="off">
         <div class="contrib-mode-toggle">
           <button class="contrib-mode-btn active" data-mode="percent" onclick="setContribMode('percent')">%</button>
           <button class="contrib-mode-btn" data-mode="fixed" onclick="setContribMode('fixed')">£</button>
@@ -1442,7 +1442,7 @@ let currentResults = { ras: null, netpay: null, ss: null };
 let activeTab = 'ras';
 let animationFrame = null;
 let contribDisplay = 'percent';
-let exactRate = 17; // precise rate — NOT constrained by slider step
+let exactRate = 5; // precise rate — NOT constrained by slider step
 let compareMode = 'same-rate'; // 'same-rate' | 'same-takehome'
 
 // --- Solver: find contribution rate that matches a target take-home pay ---
@@ -2062,8 +2062,8 @@ function loadFromURL() {
   const p = new URLSearchParams(window.location.search);
   if (p.has('ty') && TAX_YEARS[p.get('ty')]) setTaxYear(p.get('ty'));
   if (!p.has('s')) return;
-  document.getElementById('salary').value = (parseInt(p.get('s')) || 120000).toLocaleString('en-GB');
-  const rate = parseFloat(p.get('r')) || 17;
+  document.getElementById('salary').value = (parseInt(p.get('s')) || 90000).toLocaleString('en-GB');
+  const rate = parseFloat(p.get('r')) || 5;
   exactRate = rate;
   document.getElementById('contribSlider').value = rate;
   document.getElementById('contribInput').value = rate + '%';
