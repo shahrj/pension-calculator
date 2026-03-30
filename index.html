@@ -2035,13 +2035,13 @@ potInput.addEventListener('focus', function() {
 
 function updateURL(inp) {
   const params = new URLSearchParams();
-  params.set('s', Math.round(inp.salary));
-  params.set('r', Math.round(inp.employeeRate * 10) / 10);
+  if (Math.round(inp.salary) !== 90000) params.set('s', Math.round(inp.salary));
+  if (Math.round(inp.employeeRate * 10) / 10 !== 5) params.set('r', Math.round(inp.employeeRate * 10) / 10);
   if (inp.isScottish) params.set('sc', '1');
   if (inp.employerConfig.mode !== 'flat') params.set('em', inp.employerConfig.mode);
-  params.set('er', inp.employerConfig.employerRate);
-  if (inp.employerConfig.matchCap) params.set('mc', inp.employerConfig.matchCap);
-  if (inp.employerConfig.baseRate) params.set('br', inp.employerConfig.baseRate);
+  if (inp.employerConfig.employerRate !== 3) params.set('er', inp.employerConfig.employerRate);
+  if (inp.employerConfig.mode !== 'flat' && inp.employerConfig.matchCap !== 5) params.set('mc', inp.employerConfig.matchCap);
+  if (inp.employerConfig.mode === 'basematch' && inp.employerConfig.baseRate !== 3) params.set('br', inp.employerConfig.baseRate);
   if (inp.employerConfig.qualifyingEarnings) {
     params.set('qe', '1');
     params.set('ql', inp.employerConfig.qeLower);
@@ -2055,7 +2055,8 @@ function updateURL(inp) {
   if (currentTaxYear !== '2026/27') params.set('ty', currentTaxYear);
   const cpot = parseFloat(document.getElementById('projCurrentPot').value.replace(/[^0-9.]/g, '')) || 0;
   if (cpot > 0) params.set('cp', Math.round(cpot));
-  history.replaceState(null, '', window.location.pathname + '?' + params.toString());
+  const qs = params.toString();
+  history.replaceState(null, '', window.location.pathname + (qs ? '?' + qs : ''));
 }
 
 function loadFromURL() {
