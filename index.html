@@ -1103,9 +1103,9 @@ function calcTaperedAA(adjustedIncome) {
 // --- Method orchestrators ---
 
 function calcRAS(gross, employeeRate, employerConfig, studentPlans, isScottish) {
-  // Contribution % = payroll deduction — same amount leaves pay as Net Pay / SS
+  // Contribution % = gross amount going into the pension pot (employee net + HMRC basic rate relief)
   const deduction = gross * (employeeRate / 100);
-  const basicRateRelief = deduction * 0.20;  // HMRC adds 20% ON TOP into pension
+  const basicRateRelief = deduction * 0.20;  // 20% of gross; HMRC pays this portion directly to the pension provider
   const employerContrib = calcEmployerContribution(gross, employeeRate, employerConfig);
 
   // Tax and NI on full gross (RAS doesn't reduce assessed income)
@@ -1124,20 +1124,21 @@ function calcRAS(gross, employeeRate, employerConfig, studentPlans, isScottish) 
   const totalTaxRelief = incomeTax - hypotheticalTax;
   const higherRateReclaimable = Math.max(0, totalTaxRelief - basicRateRelief);
 
-  // Take-home: same deduction from pay as other methods
-  const takeHomePay = gross - deduction - incomeTax - employeeNI - studentLoan;
+  // RAS: 80% of the gross contribution leaves net pay; HMRC pays the 20% basic rate relief directly to the pension provider.
+  const netContribution = deduction - basicRateRelief;
+  const takeHomePay = gross - netContribution - incomeTax - employeeNI - studentLoan;
 
   return {
     method: 'Relief at Source', grossSalary: gross,
-    pensionContribution: deduction,            // What goes from payroll to pension provider
-    netCostToEmployee: deduction,              // Same deduction from pay as other methods
-    basicRateRelief,                           // HMRC adds this ON TOP into pension (20%)
+    pensionContribution: deduction,            // Gross amount into the pension (employee net + HMRC relief)
+    netCostToEmployee: netContribution,        // What actually leaves take-home pay (80% of gross)
+    basicRateRelief,                           // HMRC pays this portion of the gross contribution directly
     employerContribution: employerContrib,
     employerNIPassthrough: 0, taxableIncome, incomeTax, employeeNI, studentLoan,
     takeHomePay,
     takeHomeInclReclaim: takeHomePay + higherRateReclaimable,
-    totalIntoPension: deduction + basicRateRelief + employerContrib, // RAS genuinely gets more in pension
-    higherRateReclaimable,                     // Cash back via self-assessment (NOT in pension)
+    totalIntoPension: deduction + employerContrib, // Gross contribution already includes HMRC's 20%
+    higherRateReclaimable,                     // Higher/additional rate relief reclaimed via self-assessment
     warnings: []
   };
 }
@@ -1652,7 +1653,7 @@ function buildCardHTML(result, rasResult, period, flags) {
 
   addDivider();
   // Pension section — what ends up in the pot
-  addRow('Into Pension', result.pensionContribution);
+  addRow('Into Pension', result.netCostToEmployee);
   addRow('HMRC Relief', isRAS ? result.basicRateRelief : 0, {
     dash: !isRAS || result.basicRateRelief === 0, dim: true
   });
@@ -1807,19 +1808,19 @@ function renderRuler(ras, netpay, ss, isScottish) {
 
 function renderExplainers(ras, netpay, ss) {
   const grid = document.getElementById('explainerGrid');
-  const deductionStr = '£' + Math.round(ras.pensionContribution).toLocaleString('en-GB');
+  const grossContribStr = '£' + Math.round(ras.pensionContribution).toLocaleString('en-GB');
+  const netContribStr = '£' + Math.round(ras.netCostToEmployee).toLocaleString('en-GB');
   const reliefStr = '£' + Math.round(ras.basicRateRelief).toLocaleString('en-GB');
-  const totalRASPension = '£' + Math.round(ras.pensionContribution + ras.basicRateRelief).toLocaleString('en-GB');
   const reclaimStr = '£' + Math.round(ras.higherRateReclaimable).toLocaleString('en-GB');
   const npPensionStr = '£' + Math.round(netpay.pensionContribution).toLocaleString('en-GB');
 
   const cards = [];
 
-  // Card 1: Same deduction, different routing
+  // Card 1: Same pension, different routing
   cards.push({
-    title: 'Same deduction, different routing',
+    title: 'Same pension, different routing',
     type: 'info',
-    text: `${deductionStr}/year is deducted from your pay under all three methods. With RAS, HMRC adds ${reliefStr} (20%) into your pension on top — your pension receives ${totalRASPension}/year. With Net Pay and Salary Sacrifice, the full deduction goes straight in (${npPensionStr}/year) — no top-up needed because tax relief happens at source.`
+    text: `All three methods put ${grossContribStr}/year into your pension. With RAS, ${netContribStr} comes out of your net pay and HMRC adds ${reliefStr} (20% basic rate relief) directly to the pension provider. With Net Pay and Salary Sacrifice, the full ${npPensionStr} is deducted before tax — relief happens at source, no top-up needed.`
   });
 
   // Card 2: The take-home trade-off
