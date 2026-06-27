@@ -411,10 +411,17 @@ body {
 }
 .projection-hero__context { font-size: 13px; color: var(--text-secondary); }
 .projection-pots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.projection-pots--breakdown { grid-template-columns: repeat(2, 1fr); }
 .projection-pot { text-align: center; padding: 16px 8px; border-radius: 8px; }
 .projection-pot--ras { background: var(--ras-bg); }
 .projection-pot--netpay { background: var(--netpay-bg); }
 .projection-pot--ss { background: var(--ss-bg); }
+.projection-pot--neutral { background: var(--surface-hover); }
+.projection-pot--neutral .projection-pot__label { color: var(--text-tertiary); }
+.projection-note {
+  font-size: 12px; color: var(--text-secondary);
+  text-align: center; margin-top: 16px; line-height: 1.5;
+}
 .projection-pot__label {
   font-size: 11px; font-weight: 600;
   text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;
@@ -845,7 +852,7 @@ td.matrix-trap-cell .matrix-cell__thp { color: var(--danger); }
   <!-- COMPOUND GROWTH (above ruler for narrative flow) -->
   <section class="projection-section">
     <h2 class="section-title">What This Means at Retirement</h2>
-    <p class="section-subtitle">The pension pot difference, compounded over time</p>
+    <p class="section-subtitle">Your projected pension pot, compounded over time</p>
     <div class="projection-container">
       <div class="projection-inputs">
         <div class="adv-field">
@@ -863,22 +870,19 @@ td.matrix-trap-cell .matrix-cell__thp { color: var(--danger); }
       </div>
       <div class="projection-hero">
         <div class="projection-hero__diff" id="projDiff">£0</div>
-        <div class="projection-hero__context" id="projContext">more in your pension with Salary Sacrifice</div>
+        <div class="projection-hero__context" id="projContext">projected pension pot at retirement</div>
       </div>
-      <div class="projection-pots">
-        <div class="projection-pot projection-pot--ras">
-          <div class="projection-pot__label">Relief at Source</div>
-          <div class="projection-pot__value" id="projRas">£0</div>
-        </div>
-        <div class="projection-pot projection-pot--netpay">
-          <div class="projection-pot__label">Net Pay</div>
-          <div class="projection-pot__value" id="projNetpay">£0</div>
+      <div class="projection-pots projection-pots--breakdown">
+        <div class="projection-pot projection-pot--neutral">
+          <div class="projection-pot__label">From Today's Pot</div>
+          <div class="projection-pot__value" id="projFromCurrent">£0</div>
         </div>
         <div class="projection-pot projection-pot--ss">
-          <div class="projection-pot__label">Salary Sacrifice</div>
-          <div class="projection-pot__value" id="projSs">£0</div>
+          <div class="projection-pot__label">From Future Contributions</div>
+          <div class="projection-pot__value" id="projFromContrib">£0</div>
         </div>
       </div>
+      <div class="projection-note" id="projNote"></div>
       <div class="projection-caveat">Assumes real growth after inflation. Past performance does not guarantee future results. This is an illustration, not financial advice.</div>
     </div>
   </section>
@@ -1863,41 +1867,27 @@ function renderExplainers(ras, netpay, ss) {
 
 function renderProjection(ras, netpay, ss, years, growthRate) {
   const currentPot = parseFloat(document.getElementById('projCurrentPot').value.replace(/[^0-9.]/g, '')) || 0;
-  // Grow current pot + future contributions
+  // Grow today's pot + future contributions. All three methods put the same
+  // gross into the pension, so the projected pot is method-independent — use SS
+  // as the basis (it's the recommended method on take-home grounds).
   const rate = growthRate / 100;
   const grownCurrentPot = currentPot * Math.pow(1 + rate, years);
+  const fromContrib = compoundGrowth(ss.totalIntoPension, years, growthRate);
+  const totalPot = grownCurrentPot + fromContrib;
 
-  const rasPot = grownCurrentPot + compoundGrowth(ras.totalIntoPension, years, growthRate);
-  const npPot = grownCurrentPot + compoundGrowth(netpay.totalIntoPension, years, growthRate);
-  const ssPot = grownCurrentPot + compoundGrowth(ss.totalIntoPension, years, growthRate);
+  document.getElementById('projDiff').textContent = '£' + Math.round(totalPot).toLocaleString('en-GB');
+  document.getElementById('projContext').textContent =
+    `projected pot in ${years} years at ${growthRate}% real growth · ${fmt(ss.totalIntoPension, 1)}/yr going in`;
+  document.getElementById('projFromCurrent').textContent = '£' + Math.round(grownCurrentPot).toLocaleString('en-GB');
+  document.getElementById('projFromContrib').textContent = '£' + Math.round(fromContrib).toLocaleString('en-GB');
 
-  document.getElementById('projRas').textContent = '£' + Math.round(rasPot).toLocaleString('en-GB');
-  document.getElementById('projNetpay').textContent = '£' + Math.round(npPot).toLocaleString('en-GB');
-  document.getElementById('projSs').textContent = '£' + Math.round(ssPot).toLocaleString('en-GB');
-
-  // Find best pot — when SS and NP tie, prefer SS (more popular)
-  const pots = [
-    { name: 'SS', pot: ssPot, annual: ss.totalIntoPension },
-    { name: 'Net Pay', pot: npPot, annual: netpay.totalIntoPension },
-    { name: 'RAS', pot: rasPot, annual: ras.totalIntoPension }
-  ];
-  // Stable sort: SS comes first when tied with NP (same index order preserved)
-  pots.sort((a, b) => b.pot - a.pot);
-  const best = pots[0];
-  const worst = pots[pots.length - 1];
-  const diff = best.pot - worst.pot;
-
-  document.getElementById('projDiff').textContent = '£' + Math.round(diff).toLocaleString('en-GB');
-
-  if (diff < 100) {
-    const thpDiff = ss.takeHomeInclReclaim - ras.takeHomeInclReclaim;
-    document.getElementById('projContext').textContent = `All three methods produce similar pension pots. SS saves you ${fmt(Math.abs(thpDiff), 1)}/year in take-home pay via NI savings.`;
-  } else if (compareMode === 'same-takehome') {
-    const diffPerYear = fmt(best.annual - worst.annual, 1);
-    document.getElementById('projContext').textContent = `more in your pension at the same take-home pay — ${best.name} over ${years} years at ${growthRate}% growth (${diffPerYear}/yr extra)`;
-  } else {
-    const diffPerYear = fmt(best.annual - worst.annual, 1);
-    document.getElementById('projContext').textContent = `more in your pension with ${best.name} over ${years} years at ${growthRate}% growth (${diffPerYear}/yr more into the pot)`;
+  // Methods produce the same pot — the live decision is take-home pay (NI saving).
+  const thpDiff = ss.takeHomeInclReclaim - ras.takeHomeInclReclaim;
+  const note = document.getElementById('projNote');
+  if (note) {
+    note.textContent = Math.abs(thpDiff) >= 1
+      ? `All three contribution methods produce the same pot. Salary sacrifice also saves you ${fmt(Math.abs(thpDiff), 1)}/year in take-home pay via NI savings.`
+      : `All three contribution methods produce the same pension pot.`;
   }
 }
 
